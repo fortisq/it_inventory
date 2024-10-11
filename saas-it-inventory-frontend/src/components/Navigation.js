@@ -18,7 +18,10 @@ const Navigation = () => {
           <>
             <li><Link to="/dashboard">Dashboard</Link></li>
             <li><Link to="/inventory">Inventory</Link></li>
+            <li><Link to="/assets">Asset Management</Link></li>
+            <li><Link to="/software-subscriptions">Software Subscriptions</Link></li>
             <li><Link to="/subscription">Subscription</Link></li>
+            <li><Link to="/reports">Reports & Dashboards</Link></li>
             {user && user.role === 'admin' && (
               <li className="admin-menu">
                 <button onClick={toggleAdminMenu}>Admin</button>

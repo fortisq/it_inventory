@@ -1,58 +1,16 @@
 const mongoose = require('mongoose');
 
 const assetSchema = new mongoose.Schema({
-  tenant: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tenant',
-    required: true
-  },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  type: {
-    type: String,
-    enum: ['hardware', 'software'],
-    required: true
-  },
-  serialNumber: {
-    type: String,
-    trim: true
-  },
-  purchaseDate: {
-    type: Date
-  },
-  warrantyExpiryDate: {
-    type: Date
-  },
-  assignedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  status: {
-    type: String,
-    enum: ['active', 'inactive', 'maintenance', 'retired'],
-    default: 'active'
-  },
-  notes: {
-    type: String
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  name: { type: String, required: true },
+  type: { type: String, required: true },
+  serialNumber: { type: String, unique: true },
+  purchaseDate: { type: Date },
+  warrantyExpiryDate: { type: Date },
+  assignedUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  status: { type: String, enum: ['In Use', 'In Storage', 'Under Repair', 'Retired'], default: 'In Storage' },
+  location: { type: String },
+  notes: { type: String },
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
+}, { timestamps: true });
 
-assetSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
-const Asset = mongoose.model('Asset', assetSchema);
-
-module.exports = Asset;
+module.exports = mongoose.model('Asset', assetSchema);

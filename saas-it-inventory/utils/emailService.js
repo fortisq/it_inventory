@@ -53,8 +53,26 @@ const sendUpcomingRenewalNotification = async (to, planName, renewalDate) => {
   return sendEmail(to, subject, text, html);
 };
 
+// Warranty expiration notification
+const sendWarrantyExpirationNotification = async (to, assetName, expiryDate) => {
+  const subject = 'Asset Warranty Expiration';
+  const text = `The warranty for your asset "${assetName}" will expire on ${expiryDate}.`;
+  const html = `<p>The warranty for your asset "<strong>${assetName}</strong>" will expire on <strong>${expiryDate}</strong>.</p>`;
+  return sendEmail(to, subject, text, html);
+};
+
+// Software subscription expiration notification
+const sendSubscriptionExpirationNotification = async (to, subscriptionName, expiryDate) => {
+  const subject = 'Software Subscription Expiration';
+  const text = `Your software subscription "${subscriptionName}" will expire on ${expiryDate}.`;
+  const html = `<p>Your software subscription "<strong>${subscriptionName}</strong>" will expire on <strong>${expiryDate}</strong>.</p>`;
+  return sendEmail(to, subject, text, html);
+};
+
 module.exports = {
   sendSubscriptionChangeNotification,
   sendApproachingLimitNotification,
   sendUpcomingRenewalNotification,
+  sendWarrantyExpirationNotification,
+  sendSubscriptionExpirationNotification,
 };

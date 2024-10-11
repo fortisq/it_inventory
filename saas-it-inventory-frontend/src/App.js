@@ -10,6 +10,9 @@ import AdminDashboard from './components/AdminDashboard';
 import TenantManagement from './components/TenantManagement';
 import UserManagement from './components/UserManagement';
 import SubscriptionManagement from './components/SubscriptionManagement';
+import AssetManagement from './components/AssetManagement';
+import SoftwareSubscriptionManagement from './components/SoftwareSubscriptionManagement';
+import ReportsAndDashboards from './components/ReportsAndDashboards';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -50,6 +53,9 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/subscription" element={<SubscriptionManagement />} />
+                <Route path="/assets" element={<AssetManagement />} />
+                <Route path="/software-subscriptions" element={<SoftwareSubscriptionManagement />} />
+                <Route path="/reports" element={<ReportsAndDashboards />} />
               </Route>
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminDashboard />} />
