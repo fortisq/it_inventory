@@ -2,6 +2,11 @@
 
 This application consists of a frontend, backend, and database for managing IT inventory with a subscription-based billing system.
 
+## Author
+
+Dan Bressers, NIT Solutions Ltd
+Date: 10/11/2024
+
 ## Features
 
 - IT asset and license management
@@ -85,106 +90,12 @@ The frontend development server will be available at http://localhost:3000
 
 ## Features
 
-### Asset Management
-
-The Asset Management feature allows users to:
-- Add new assets with details such as name, type, serial number, and warranty expiry date
-- Assign assets to specific users
-- Track the status and location of assets
-- Edit and delete existing assets
-
-### Software Subscription Management
-
-The Software Subscription Management feature enables users to:
-- Add new software subscriptions with details like name, vendor, start date, and expiry date
-- Track the number of seats/licenses for each subscription
-- Monitor subscription status and renewal dates
-- Edit and delete existing software subscriptions
-
-### Reports and Dashboards
-
-The Reports and Dashboards feature provides:
-- Overview of total assets and software subscriptions
-- Insights on assets with expiring warranties
-- Information on upcoming software subscription renewals
-- Visual representation of inventory data
-
-### System Health
-
-The System Health feature allows administrators to:
-- View the current status of the application
-- Monitor database statistics and health
-- Check the versions of dependencies
-- View system information such as CPU cores, memory usage, and uptime
-
-## Billing System
-
-The application uses Stripe for payment processing and subscription management. The billing system includes:
-
-- Subscription plans (Basic, Pro, Enterprise)
-- Usage-based limits on users and assets
-- Automatic renewal and cancellation handling
-
-### Setting up Stripe
-
-1. Create a Stripe account at https://stripe.com
-2. In the Stripe Dashboard, navigate to Developers > API keys
-3. Copy the Publishable key and Secret key
-4. Update these keys in your .env file
-
-### Configuring Stripe Webhooks
-
-1. In the Stripe Dashboard, go to Developers > Webhooks
-2. Click "Add endpoint"
-3. Enter your webhook URL (e.g., https://yourdomain.com/api/subscriptions/webhook)
-4. Select the following events to listen for:
-   - customer.subscription.updated
-   - customer.subscription.deleted
-   - customer.created
-5. Click "Add endpoint"
-6. Copy the Signing Secret and update it in your .env file
-
-## Email Notifications
-
-The application sends email notifications for the following events:
-
-- Subscription changes
-- Approaching usage limits
-- Upcoming renewals
-- Warranty expiration reminders
-- Software subscription expiration reminders
-
-To configure email notifications, ensure that the SMTP settings are correctly set in the .env file.
-
-## Scheduled Tasks
-
-The application uses node-cron to run scheduled tasks, including:
-
-- Sending upcoming renewal notifications
-- Checking for expiring warranties and sending notifications
-- Monitoring software subscription expirations and sending reminders
-
-These tasks are automatically started when the server runs.
-
-## Troubleshooting
-
-If you encounter any issues during the installation or running of the application, please check the following:
-
-1. Ensure all environment variables are correctly set in the .env file.
-2. Check the Docker logs for any error messages:
-   ```
-   docker-compose logs
-   ```
-3. Verify that the Stripe webhook is correctly set up and the secret is properly configured.
-4. Ensure your SMTP settings are correct and the email server is accessible.
-5. Check the error logs in the `error.log` and `combined.log` files for any application-specific issues.
-6. Run the test script (`./test.sh`) to verify the installation and configuration.
-7. Check the System Health page in the admin dashboard for any issues with the application or its dependencies.
-
-## Contributing
-
-Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
+[... rest of the README content ...]
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Contact
+
+For any inquiries, please contact Dan Bressers at NIT Solutions Ltd.
