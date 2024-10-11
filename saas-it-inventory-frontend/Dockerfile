@@ -1,14 +1,14 @@
-# Use an official Node runtime as the base image
-FROM node:14
+# Build stage
+FROM node:14.17.6-alpine AS build
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
 # Copy the rest of the application code
 COPY . .
@@ -16,14 +16,32 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Use nginx to serve the static files
-FROM nginx:alpine
+# Production stage
+FROM nginx:1.21-alpine
 
-# Copy the build output to replace the default nginx contents.
-COPY --from=0 /app/build /usr/share/nginx/html
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy the build output to replace the default nginx contents
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Set proper permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html && \
+        chown -R nginx:nginx /var/cache/nginx && \
+        chown -R nginx:nginx /var/log/nginx && \
+        chown -R nginx:nginx /etc/nginx/conf.d
+RUN touch /var/run/nginx.pid && \
+        chown -R nginx:nginx /var/run/nginx.pid
+
+# Switch to non-root user
+USER nginx
 
 # Expose port 80
 EXPOSE 80
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
