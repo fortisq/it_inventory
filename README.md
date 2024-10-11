@@ -11,6 +11,7 @@ This application consists of a frontend, backend, and database for managing IT i
 - Subscription-based billing system
 - Email notifications for subscription events, warranty expirations, and software subscription renewals
 - Reports and dashboards for asset and subscription insights
+- System Health monitoring for administrators
 
 ## Prerequisites
 
@@ -45,6 +46,24 @@ This application consists of a frontend, backend, and database for managing IT i
 5. After the script completes, set up the Stripe webhook as instructed in the terminal output.
 
 6. Log out and log back in for the Docker group changes to take effect.
+
+## Testing the Installation
+
+After completing the installation process, you can run the test script to verify that everything is set up correctly:
+
+1. Make the test script executable:
+   ```
+   chmod +x test.sh
+   ```
+
+2. Run the test script:
+   ```
+   ./test.sh
+   ```
+
+This script will check various components of the application to ensure they are functioning correctly.
+
+## Usage
 
 The application will be available at:
 - Frontend: http://localhost
@@ -89,6 +108,14 @@ The Reports and Dashboards feature provides:
 - Insights on assets with expiring warranties
 - Information on upcoming software subscription renewals
 - Visual representation of inventory data
+
+### System Health
+
+The System Health feature allows administrators to:
+- View the current status of the application
+- Monitor database statistics and health
+- Check the versions of dependencies
+- View system information such as CPU cores, memory usage, and uptime
 
 ## Billing System
 
@@ -139,43 +166,6 @@ The application uses node-cron to run scheduled tasks, including:
 
 These tasks are automatically started when the server runs.
 
-## Testing
-
-To thoroughly test the application:
-
-1. Test asset management features:
-   - Adding, editing, and deleting assets
-   - Assigning assets to users
-   - Filtering and searching assets
-
-2. Test software subscription management features:
-   - Adding, editing, and deleting software subscriptions
-   - Tracking subscription renewals and expirations
-
-3. Test the subscription flow:
-   - New subscription sign-up
-   - Subscription upgrade/downgrade
-   - Subscription cancellation
-   - Failed payment scenarios
-
-4. Verify that appropriate email notifications are sent for each scenario
-5. Check that usage limits are enforced correctly
-6. Test the reports and dashboards functionality
-7. Verify that scheduled tasks for notifications are working correctly
-
-## Considerations for Larger-Scale Deployments
-
-For larger-scale deployments, consider the following:
-
-1. Use a more robust job scheduling system like Bull or Agenda, which use Redis for better scalability and reliability.
-2. Implement a caching layer (e.g., Redis) to reduce database load and improve response times.
-3. Set up a load balancer and multiple application servers to handle increased traffic.
-4. Use a managed database service for better scalability and automatic backups.
-5. Implement rate limiting to prevent API abuse.
-6. Set up monitoring and alerting using tools like Prometheus and Grafana.
-7. Use a Content Delivery Network (CDN) for serving static assets.
-8. Implement database indexing and query optimization for better performance.
-
 ## Troubleshooting
 
 If you encounter any issues during the installation or running of the application, please check the following:
@@ -188,6 +178,8 @@ If you encounter any issues during the installation or running of the applicatio
 3. Verify that the Stripe webhook is correctly set up and the secret is properly configured.
 4. Ensure your SMTP settings are correct and the email server is accessible.
 5. Check the error logs in the `error.log` and `combined.log` files for any application-specific issues.
+6. Run the test script (`./test.sh`) to verify the installation and configuration.
+7. Check the System Health page in the admin dashboard for any issues with the application or its dependencies.
 
 ## Contributing
 

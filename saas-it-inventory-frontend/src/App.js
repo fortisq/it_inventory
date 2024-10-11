@@ -13,6 +13,7 @@ import SubscriptionManagement from './components/SubscriptionManagement';
 import AssetManagement from './components/AssetManagement';
 import SoftwareSubscriptionManagement from './components/SoftwareSubscriptionManagement';
 import ReportsAndDashboards from './components/ReportsAndDashboards';
+import SystemHealth from './components/SystemHealth';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -61,6 +62,7 @@ function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/tenants" element={<TenantManagement />} />
                 <Route path="/admin/users" element={<UserManagement />} />
+                <Route path="/admin/system-health" element={<SystemHealth />} />
               </Route>
               <Route path="/" element={<Navigate to="/login" />} />
             </Routes>
