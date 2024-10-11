@@ -22,8 +22,8 @@ This application consists of a frontend, backend, and database for managing IT i
 
 1. Clone this repository to your server:
    ```
-   git clone https://github.com/your-repo/saas-it-inventory.git
-   cd saas-it-inventory
+   git clone https://github.com/fortisq/it_inventory.git
+   cd it_inventory
    ```
 
 2. Make the setup script executable:
