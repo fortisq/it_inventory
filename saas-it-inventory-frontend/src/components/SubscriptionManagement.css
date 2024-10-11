@@ -1,0 +1,149 @@
+.subscription-management {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.current-plan {
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.current-plan h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.usage-info {
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.usage-info h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.usage-info p {
+  margin: 5px 0;
+}
+
+.plan-options {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.plan {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  width: calc(33.33% - 20px);
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.plan:hover {
+  transform: translateY(-5px);
+}
+
+.plan h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.plan .price {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.plan ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.plan button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.plan button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.plan button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.cancel-subscription {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.cancel-button {
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.invoice-history, .payment-methods {
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.invoice-history h3, .payment-methods h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.invoice-history ul, .payment-methods ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.invoice-history li, .payment-methods li {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .plan {
+    width: 100%;
+  }
+}
