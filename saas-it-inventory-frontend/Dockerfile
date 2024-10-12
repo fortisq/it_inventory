@@ -1,11 +1,13 @@
 # Build stage
-FROM node:16-alpine AS build
+FROM node:20-alpine AS build
 
 # Set working directory
 WORKDIR /app
 
-# Update npm to the latest stable version
-RUN npm install -g npm@10.6.0
+# Update npm to the latest version and print versions
+RUN npm install -g npm@latest && \
+    echo "Node.js version: $(node -v)" && \
+    echo "npm version: $(npm -v)"
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
