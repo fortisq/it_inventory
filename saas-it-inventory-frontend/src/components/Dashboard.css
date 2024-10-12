@@ -10,6 +10,18 @@
   padding-bottom: 10px;
 }
 
+.menu-toggle {
+  display: none;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
 .dashboard-menu {
   list-style-type: none;
   padding: 0;
@@ -59,6 +71,8 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
 }
 
 .logout-button:hover {
@@ -68,4 +82,48 @@
 .logout-button:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .dashboard-menu {
+    display: none;
+    flex-direction: column;
+  }
+
+  .dashboard-menu.open {
+    display: flex;
+  }
+
+  .dashboard-menu li {
+    width: 100%;
+  }
+
+  .user-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-link, .logout-button {
+    margin-top: 10px;
+    text-align: center;
+  }
 }
