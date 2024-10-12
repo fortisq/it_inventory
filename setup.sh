@@ -36,21 +36,21 @@ fi
 log "Updating and upgrading the system..."
 sudo apt-get update && sudo apt-get upgrade -y || error "Failed to update and upgrade the system"
 
-# Install Node.js and npm
+# Install Node.js 16.x and npm
 if ! command_exists node || ! command_exists npm; then
-    log "Installing Node.js and npm..."
-    sudo apt-get install -y nodejs npm || error "Failed to install Node.js and npm"
+    log "Installing Node.js 16.x and npm..."
+    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+    sudo apt-get install -y nodejs || error "Failed to install Node.js 16.x and npm"
 else
     log "Node.js and npm are already installed. Checking versions..."
     node_version=$(node --version)
     npm_version=$(npm --version)
     log "Node.js version: $node_version"
     log "npm version: $npm_version"
+    if [[ ! "$node_version" =~ ^v16\. ]]; then
+        error "Node.js version 16.x is required. Please update Node.js and run the script again."
+    fi
 fi
-
-# Install specific npm version
-log "Installing npm version 6.14.15..."
-sudo npm install -g npm@6.14.15 || error "Failed to install npm version 6.14.15"
 
 # Install Docker
 if ! command_exists docker; then
