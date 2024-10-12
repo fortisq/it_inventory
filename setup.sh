@@ -37,10 +37,19 @@ if [ "$(id -u)" = "0" ]; then
     error "This script should not be run as root. Please run as a normal user."
 fi
 
-# Add current user to docker group and refresh group permissions
-log "Adding current user to docker group and refreshing permissions..."
-sudo usermod -aG docker $USER
-newgrp docker
+# Check if user is in docker group
+if ! groups | grep -q docker; then
+    log "Adding current user to docker group..."
+    sudo usermod -aG docker $USER
+    log "You have been added to the docker group."
+    log "Running newgrp docker to apply changes..."
+    exec newgrp docker <<EOF
+    log "Group changes applied. Please run the setup script again."
+    exit 0
+EOF
+fi
+
+# The rest of the script continues here...
 
 # Update and upgrade the system
 log "Updating and upgrading the system..."
