@@ -19,8 +19,8 @@ RUN npm install @types/node
 # Copy the rest of the application code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application with verbose output
+RUN npm run build -- --verbose
 
 # Production stage
 FROM nginx:1.21-alpine

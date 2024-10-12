@@ -169,6 +169,10 @@ log "Encryption Key generated and saved to .env"
 log "Copying .env to frontend directory..."
 cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to frontend directory"
 
+# Verify Docker permissions
+log "Verifying Docker permissions..."
+$SUDO docker info > /dev/null 2>&1 || error "Failed to run docker command. Please try logging out and back in, then run this script again."
+
 # Build and start the containers
 log "Building and starting Docker containers..."
 $SUDO docker-compose up -d --build || error "Failed to build and start Docker containers"
