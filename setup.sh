@@ -48,6 +48,10 @@ else
     log "npm version: $npm_version"
 fi
 
+# Install specific npm version
+log "Installing npm version 6.14.15..."
+sudo npm install -g npm@6.14.15 || error "Failed to install npm version 6.14.15"
+
 # Install Docker
 if ! command_exists docker; then
     log "Installing Docker..."
@@ -105,6 +109,12 @@ if [ ! -f saas-it-inventory/package.json ]; then
 fi
 cat saas-it-inventory/package.json || error "Failed to read package.json"
 
+# Attempt to install dependencies locally
+log "Attempting to install dependencies locally..."
+cd saas-it-inventory
+npm ci --verbose || error "Failed to install dependencies locally"
+cd ..
+
 # Backup existing .env file
 if [ -f .env ]; then
     log "Backing up existing .env file..."
@@ -135,15 +145,6 @@ log "Encryption Key generated and saved to .env"
 # Copy .env to frontend directory
 log "Copying .env to frontend directory..."
 cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to frontend directory"
-
-# Clear npm cache and remove node_modules
-log "Clearing npm cache and removing node_modules..."
-$SUDO npm cache clean --force
-$SUDO rm -rf saas-it-inventory/node_modules saas-it-inventory-frontend/node_modules
-
-# Install dependencies
-log "Installing dependencies..."
-$SUDO npm ci || error "Failed to install dependencies"
 
 # Build and start the containers
 log "Building and starting Docker containers..."
