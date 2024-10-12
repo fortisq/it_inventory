@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Replaced npm install with npm ci for more reliable dependency installation
   - Added automatic installation of Node.js and npm if not present on the system
   - Added option to continue setup with sudo if user permissions are insufficient
+  - Added steps to clear npm cache and remove node_modules before rebuilding
 
 ### Changed
 - Updated Navigation component to include links to Reports section and Help & Support Portal
@@ -82,6 +83,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added checks and installation for Node.js and npm dependencies
   - Improved Docker permission handling by adding current user to docker group
   - Added option to continue setup with sudo if user permissions are insufficient
+- Updated Dockerfile:
+  - Changed npm ci command to install all dependencies, including devDependencies
 
 ### Fixed
 - Various bug fixes and performance improvements
@@ -89,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced robustness and reliability of the installation process
 - Resolved issue with missing npm command in setup script by adding Node.js and npm installation
 - Addressed Docker permission issues in setup script by adding user to docker group and providing sudo option
+- Fixed npm dependency issues in Docker build process by installing all dependencies
 
 ## [1.0.0] - 2023-05-01
 

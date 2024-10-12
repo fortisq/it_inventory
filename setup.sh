@@ -129,6 +129,11 @@ log "Encryption Key generated and saved to .env"
 log "Copying .env to frontend directory..."
 cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to frontend directory"
 
+# Clear npm cache and remove node_modules
+log "Clearing npm cache and removing node_modules..."
+$SUDO npm cache clean --force
+$SUDO rm -rf saas-it-inventory/node_modules saas-it-inventory-frontend/node_modules
+
 # Install dependencies
 log "Installing dependencies..."
 $SUDO npm ci || error "Failed to install dependencies"
