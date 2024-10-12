@@ -79,13 +79,6 @@ if [ -f .env ]; then
     cp .env .env.backup.$(date +%Y%m%d%H%M%S)
 fi
 
-# Function to prompt for environment variables
-prompt_env_var() {
-    read -p "Enter $2 ($1): " value
-    value=${value:-$3}
-    echo "$1=$value" >> .env
-}
-
 # Create and configure .env file
 log "Configuring environment variables..."
 rm -f .env
@@ -93,7 +86,8 @@ touch .env
 
 # Configure MongoDB
 log "Configuring MongoDB..."
-prompt_env_var "MONGODB_URI" "MongoDB URI" "mongodb://mongo:27017/it_inventory"
+echo "MONGODB_URI=mongodb://mongo:27017/it_inventory" >> .env
+log "MongoDB URI configured automatically"
 
 # Generate and save JWT Secret
 JWT_SECRET=$(openssl rand -base64 32)
@@ -124,7 +118,7 @@ sleep 10
 # Validate MongoDB connection
 log "Validating MongoDB connection..."
 if ! docker-compose exec -T backend node -e "const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected')).catch((err) => { console.error(err); process.exit(1); })"; then
-    error "Failed to connect to MongoDB. Please check your MongoDB URI."
+    error "Failed to connect to MongoDB. Please check your MongoDB configuration."
 fi
 
 log "Setup complete. Please log out and log back in for the docker group changes to take effect."

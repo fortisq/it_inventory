@@ -76,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved error handling and logging
   - Enhanced security considerations and warnings
   - Added more detailed progress information during installation
+  - Automated MongoDB URI configuration, removing the need for user input
 
 ### Fixed
 - Various bug fixes and performance improvements
