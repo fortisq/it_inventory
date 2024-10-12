@@ -102,7 +102,7 @@ log "newgrp docker"
 log "Applying group changes..."
 exec sg docker -c "
     # Navigate to the project root directory
-    cd '$(dirname "$0")' || error 'Failed to navigate to the project directory'
+    cd \"$(dirname "$0")\" || error \"Failed to navigate to the project directory\"
 
     # Regenerate package-lock.json for backend
     log 'Regenerating package-lock.json for backend...'
@@ -150,13 +150,13 @@ exec sg docker -c "
 
     # Generate and save JWT Secret
     JWT_SECRET=$(openssl rand -base64 32)
-    echo "JWT_SECRET=$JWT_SECRET" >> .env
+    echo \"JWT_SECRET=$JWT_SECRET\" >> .env
     log 'JWT Secret generated and saved to .env'
     log 'WARNING: Storing secrets in .env files can be a security risk. Consider using a secret management solution in production.'
 
     # Generate and save Encryption Key for sensitive data
     ENCRYPTION_KEY=$(openssl rand -base64 32)
-    echo "ENCRYPTION_KEY=$ENCRYPTION_KEY" >> .env
+    echo \"ENCRYPTION_KEY=$ENCRYPTION_KEY\" >> .env
     log 'Encryption Key generated and saved to .env'
 
     # Copy .env to frontend directory
@@ -172,7 +172,7 @@ exec sg docker -c "
 
     # Validate MongoDB connection
     log 'Validating MongoDB connection...'
-    if ! docker-compose exec -T backend node -e "const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected')).catch((err) => { console.error(err); process.exit(1); })"; then
+    if ! docker-compose exec -T backend node -e \"const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected')).catch((err) => { console.error(err); process.exit(1); })\"; then
         error 'Failed to connect to MongoDB. Please check your MongoDB configuration.'
     fi
 
