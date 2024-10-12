@@ -31,6 +31,7 @@ export const getTenants = () => api.get('/tenants');
 export const createTenant = (tenantData) => api.post('/tenants', tenantData);
 export const updateTenant = (id, tenantData) => api.put(`/tenants/${id}`, tenantData);
 export const deleteTenant = (id) => api.delete(`/tenants/${id}`);
+export const getTenantActivityLogs = (tenantId) => api.get(`/tenants/${tenantId}/activity-logs`);
 
 export const getUsers = () => api.get('/users');
 export const createUser = (userData) => api.post('/users', userData);
