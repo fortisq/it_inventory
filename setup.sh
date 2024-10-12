@@ -110,6 +110,13 @@ fi
 # Navigate to the project root directory
 cd "$(dirname "$0")" || error "Failed to navigate to the project directory"
 
+# Regenerate package-lock.json
+log "Regenerating package-lock.json..."
+cd saas-it-inventory || error "Failed to navigate to saas-it-inventory directory"
+rm -f package-lock.json
+npm install || error "Failed to regenerate package-lock.json"
+cd ..
+
 # Verify package.json content
 log "Verifying package.json content..."
 if [ ! -f saas-it-inventory/package.json ]; then
