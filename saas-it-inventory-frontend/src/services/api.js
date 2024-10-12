@@ -48,6 +48,12 @@ export const createCheckoutSession = (plan) => api.post('/subscriptions/create-c
 export const getInvoiceHistory = () => api.get('/subscriptions/invoices');
 export const getPaymentMethods = () => api.get('/subscriptions/payment-methods');
 
+// Software Subscriptions
+export const getSoftwareSubscriptions = () => api.get('/software-subscriptions');
+export const createSoftwareSubscription = (subscriptionData) => api.post('/software-subscriptions', subscriptionData);
+export const updateSoftwareSubscription = (id, subscriptionData) => api.put(`/software-subscriptions/${id}`, subscriptionData);
+export const deleteSoftwareSubscription = (id) => api.delete(`/software-subscriptions/${id}`);
+
 // System Health and User Profile
 export const getSystemHealth = () => api.get('/system/health');
 export const updateUserProfile = (userData) => api.put('/users/profile', userData);
