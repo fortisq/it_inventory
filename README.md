@@ -26,12 +26,13 @@ Key files in this project contain copyright notices. When contributing to this p
 - Reports and dashboards for asset and subscription insights
 - System Health monitoring for administrators
 - Help and Support Portal for users and administrators
+- Tenant-specific SMTP configuration for customized email settings
+- Admin-controlled Stripe settings management for flexible payment processing
 
 ## Prerequisites
 
 - A Linux-based system (Ubuntu recommended)
-- A Stripe account for payment processing
-- An SMTP server for sending emails
+- Docker and Docker Compose
 
 ## Installation
 
@@ -51,15 +52,23 @@ Key files in this project contain copyright notices. When contributing to this p
    ./setup.sh
    ```
 
-4. Follow the prompts to enter your configuration details, including:
-   - MongoDB URI
-   - JWT Secret
-   - Stripe API keys
-   - SMTP settings
+4. Follow the prompts to enter your MongoDB URI.
 
-5. After the script completes, set up the Stripe webhook as instructed in the terminal output.
+5. The script will generate a JWT Secret. Make sure to save this secret securely, as you'll need it for admin configuration.
 
 6. Log out and log back in for the Docker group changes to take effect.
+
+## Post-Installation Configuration
+
+After running the setup script, you need to configure the payment and SMTP settings:
+
+1. Access the admin panel of the application.
+2. Navigate to the "Settings" or "Configuration" section.
+3. Enter your Stripe API keys for payment processing.
+4. Configure the global SMTP settings for email notifications.
+5. Optionally, configure tenant-specific SMTP settings for individual organizations.
+
+Detailed instructions for these steps can be found in the [Admin Instructions](AdminInstructions.md) document.
 
 ## Testing the Installation
 
@@ -140,6 +149,18 @@ The Help and Support Portal feature provides:
 - Notification system for new help requests and updates
 - System update announcements for users
 
+### SMTP Configuration
+
+- Global SMTP settings managed by system administrators
+- Tenant-specific SMTP settings for customized email configurations
+- Ability for tenant administrators to configure their own SMTP settings
+
+### Stripe Integration
+
+- Centralized Stripe settings management for administrators
+- Ability to configure Stripe settings for individual tenants
+- Secure handling of Stripe API keys and webhook secrets
+
 ## Billing System
 
 The application uses Stripe for payment processing and subscription management. The billing system includes:
@@ -177,7 +198,7 @@ The application sends email notifications for the following events:
 - Warranty expiration reminders
 - Software subscription expiration reminders
 
-To configure email notifications, ensure that the SMTP settings are correctly set in the .env file.
+To configure email notifications, ensure that the SMTP settings are correctly set in the .env file or through the admin panel.
 
 ## Scheduled Tasks
 
@@ -198,11 +219,10 @@ If you encounter any issues during the installation or running of the applicatio
    ```
    docker-compose logs
    ```
-3. Verify that the Stripe webhook is correctly set up and the secret is properly configured.
-4. Ensure your SMTP settings are correct and the email server is accessible.
-5. Check the error logs in the `error.log` and `combined.log` files for any application-specific issues.
-6. Run the test script (`./test.sh`) to verify the installation and configuration.
-7. Check the System Health page in the admin dashboard for any issues with the application or its dependencies.
+3. Ensure your Stripe and SMTP settings are correctly configured in the admin panel.
+4. Check the error logs in the `error.log` and `combined.log` files for any application-specific issues.
+5. Run the test script (`./test.sh`) to verify the installation and configuration.
+6. Check the System Health page in the admin dashboard for any issues with the application or its dependencies.
 
 ## Documentation
 

@@ -141,3 +141,20 @@ If you encounter any issues while using the application:
 1. Check the Help & Support Portal for relevant help documents.
 2. If you can't find a solution, submit a help request through the portal.
 3. For urgent issues, contact your system administrator directly.
+
+## Email Settings (for Tenant Administrators)
+
+If you are a tenant administrator, you have the ability to configure custom SMTP settings for your organization:
+
+1. Navigate to the "Settings" or "Email Configuration" section in the admin panel.
+2. You will see options to configure your SMTP server:
+   - SMTP Host
+   - SMTP Port
+   - SMTP Username
+   - SMTP Password
+   - From Email Address
+3. Enter your SMTP server details.
+4. Click "Test Configuration" to ensure the settings are correct.
+5. If the test is successful, click "Save" to apply the new SMTP settings.
+
+Note: If you don't configure custom SMTP settings, your organization will use the default system-wide email settings.

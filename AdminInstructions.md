@@ -79,6 +79,46 @@
 3. Always ensure you have a recent backup before applying updates.
 4. The update process now features a more detailed progress indicator.
 
+## Payment and SMTP Configuration
+
+After the initial setup, you need to configure the payment (Stripe) and SMTP settings in the admin panel.
+
+### Configuring Stripe for Payments
+
+1. Navigate to "Payment Settings" in the admin panel.
+2. Enter your Stripe API keys:
+   - Stripe Publishable Key
+   - Stripe Secret Key
+3. Configure your subscription plans:
+   - Set up the pricing tiers
+   - Define the features available in each plan
+4. Save the changes.
+
+### Setting up SMTP for Email Notifications
+
+1. Go to "Email Settings" in the admin panel.
+2. Enter your SMTP server details:
+   - SMTP Host
+   - SMTP Port
+   - SMTP Username
+   - SMTP Password
+   - From Email Address
+3. Test the email configuration by sending a test email.
+4. Save the settings once the test is successful.
+
+### Configuring Stripe Webhooks
+
+1. In your Stripe Dashboard, go to Developers > Webhooks.
+2. Click "Add endpoint" and enter your webhook URL (e.g., https://yourdomain.com/api/subscriptions/webhook).
+3. Select the following events to listen for:
+   - customer.subscription.updated
+   - customer.subscription.deleted
+   - customer.created
+4. Copy the Webhook Signing Secret provided by Stripe.
+5. In the admin panel, navigate to "Payment Settings" and enter the Webhook Signing Secret.
+
+Remember to keep your API keys and SMTP credentials secure. Do not share them with unauthorized individuals.
+
 ## Reports and Analytics
 
 1. Access "Reports and Analytics" in the admin panel.
@@ -187,3 +227,33 @@
 9. Familiarize yourself with the new responsive design to effectively manage the system on various devices.
 
 Remember, as an administrator, you have significant control over the system. Always be cautious when making system-wide changes and consider the potential impact on all users and tenants.
+
+## SMTP and Stripe Settings Management
+
+### Managing SMTP Settings (Admin and Tenant)
+
+1. Navigate to "Email Settings" in the admin panel.
+2. Here you can view and update the global SMTP settings.
+3. For tenant-specific SMTP settings:
+   - Go to "Tenant Management"
+   - Select the specific tenant
+   - Click on "Email Settings" for that tenant
+4. Tenants can configure their own SMTP settings, which will override the global settings for their specific tenant.
+
+### Managing Stripe Settings (Admin Only)
+
+1. Go to "Payment Settings" in the admin panel.
+2. Here you can view and update the global Stripe settings.
+3. To manage Stripe settings for individual tenants:
+   - Navigate to "Tenant Management"
+   - Select the specific tenant
+   - Click on "Payment Settings" for that tenant
+4. Only administrators can adjust Stripe settings. These settings apply globally or can be customized for each tenant.
+
+### Best Practices for SMTP and Stripe Management
+
+1. Regularly review and update SMTP and Stripe settings to ensure they are current and secure.
+2. Use environment variables or secure vaults to store sensitive information like API keys and passwords.
+3. Implement proper error handling and logging for SMTP and Stripe operations to quickly identify and resolve issues.
+4. Provide clear instructions to tenants on how to configure their SMTP settings if they choose to use their own.
+5. Regularly audit Stripe settings and transactions to ensure compliance with financial regulations and to detect any unusual activity.

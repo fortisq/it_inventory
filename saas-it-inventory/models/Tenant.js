@@ -12,7 +12,22 @@ const tenantSchema = new mongoose.Schema({
   assetLimit: { type: Number, default: 100 }, // Default limit for basic plan
   stripeCustomerId: { type: String },
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
+  smtpSettings: {
+    host: { type: String },
+    port: { type: Number },
+    secure: { type: Boolean, default: false },
+    auth: {
+      user: { type: String },
+      pass: { type: String }
+    },
+    from: { type: String }
+  },
+  stripeSettings: {
+    publishableKey: { type: String },
+    secretKey: { type: String },
+    webhookSecret: { type: String }
+  }
 });
 
 tenantSchema.pre('save', function(next) {

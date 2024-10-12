@@ -8,6 +8,17 @@ A: It's a cloud-based solution for managing IT assets and software subscriptions
 ### Q: How secure is my data?
 A: We use industry-standard encryption and security practices to protect your data. All data is encrypted at rest and in transit. We also employ regular security audits and follow best practices for data protection.
 
+## Installation and Setup
+
+### Q: How do I set up the application?
+A: Follow the instructions in the README.md file. Run the setup.sh script, which will guide you through the installation process, including database setup and JWT secret generation.
+
+### Q: Where do I configure payment and SMTP settings?
+A: After the initial setup, administrators can configure payment (Stripe) and SMTP settings in the admin panel. Refer to the AdminInstructions.md file for detailed steps.
+
+### Q: Is the JWT secret automatically generated?
+A: Yes, the setup script now automatically generates a secure JWT secret for you. Make sure to save this secret securely, as you'll need it for admin configuration.
+
 ## Account Management
 
 ### Q: How do I reset my password?
@@ -65,6 +76,20 @@ A: We offer monthly and annual subscription plans. Billing is based on the numbe
 ### Q: Can I upgrade or downgrade my subscription?
 A: Yes, you can change your subscription plan at any time. Changes will be reflected in your next billing cycle. To make changes, go to the "Subscription" section and select "Change Plan".
 
+### Q: How do I set up Stripe for payments?
+A: Administrators can set up Stripe in the admin panel under "Payment Settings". You'll need to enter your Stripe API keys and configure your subscription plans. Detailed instructions are available in the AdminInstructions.md file.
+
+### Q: Can I use a different payment processor?
+A: Currently, the application is set up to use Stripe. If you need to use a different payment processor, please contact our support team for assistance.
+
+## Email Notifications
+
+### Q: How do I configure email notifications?
+A: Administrators can set up SMTP settings in the admin panel under "Email Settings". You'll need to provide your SMTP server details. Refer to the AdminInstructions.md file for step-by-step instructions.
+
+### Q: What types of email notifications does the system send?
+A: The system sends notifications for subscription changes, approaching usage limits, upcoming renewals, warranty expirations, and software subscription expirations. Users can manage their notification preferences in their profile settings.
+
 ## Accessibility
 
 ### Q: Is the application accessible for users with disabilities?
@@ -77,8 +102,6 @@ A: First, check this FAQ and the user documentation. If the issue persists, cont
 
 ### Q: Is there a mobile app available?
 A: Currently, we offer a responsive web application that works on mobile devices. A dedicated mobile app is in our product roadmap.
-
-If you have any questions not covered here, please don't hesitate to contact our support team.
 
 ## Help and Support Portal
 
@@ -102,3 +125,37 @@ A: Yes, you'll receive notifications when there are updates to your help request
 
 ### Q: Can I view system updates and announcements in the Help and Support Portal?
 A: Yes, the Help and Support Portal includes a section for system updates and announcements. This keeps you informed about new features, maintenance schedules, and other important information.
+
+## SMTP and Stripe Settings Management
+
+### Q: Can tenants configure their own Stripe settings?
+A: No, Stripe settings can only be configured by administrators. This ensures consistent payment processing across the platform. Tenants can view their billing information, but cannot modify payment settings directly.
+
+### Q: How are Stripe settings managed for individual tenants?
+A: Administrators can manage Stripe settings for individual tenants through the "Tenant Management" section in the admin panel. This allows for customized billing configurations when necessary.
+
+### Q: Can tenants configure their own SMTP settings?
+A: Yes, tenants can configure their own SMTP settings. These tenant-specific settings will override the global SMTP settings for that particular tenant.
+
+### Q: How do tenant-specific SMTP settings work?
+A: When a tenant configures their own SMTP settings, all email notifications for that tenant will be sent using their specific SMTP server. This allows for greater customization and control over email communications.
+
+### Q: What happens if a tenant doesn't configure SMTP settings?
+A: If a tenant doesn't configure their own SMTP settings, the system will use the global SMTP settings configured by the administrator.
+
+### Q: Can administrators see or modify tenant-specific SMTP settings?
+A: Yes, administrators have access to view and modify SMTP settings for all tenants through the "Tenant Management" section in the admin panel.
+
+### Q: How are Stripe API keys and SMTP credentials kept secure?
+A: We use industry-standard encryption to store sensitive information like API keys and credentials. Access to this information is strictly limited and all actions are logged for security auditing.
+
+### Q: Are tenant-specific SMTP settings isolated from other tenants?
+A: Yes, each tenant's SMTP settings are securely isolated. One tenant cannot access or use another tenant's SMTP configuration.
+
+### Q: How can I monitor SMTP and Stripe integration health?
+A: Administrators can monitor the health of SMTP and Stripe integrations through the "System Health" section in the admin panel. This includes checking for failed email deliveries or payment processing issues.
+
+### Q: What should I do if there are issues with SMTP or Stripe integrations?
+A: If you encounter issues, first check the system logs in the admin panel. For SMTP issues, verify the configuration settings. For Stripe issues, ensure your API keys are correct and your Stripe account is in good standing. If problems persist, contact our support team.
+
+If you have any questions not covered here, please don't hesitate to contact our support team.

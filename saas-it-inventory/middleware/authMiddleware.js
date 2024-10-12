@@ -29,4 +29,30 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = authMiddleware;
+const isAdmin = async (req, res, next) => {
+  try {
+    if (req.user.role !== 'admin') {
+      throw new Error();
+    }
+    next();
+  } catch (error) {
+    res.status(403).send({ error: 'Access denied. Admin privileges required.' });
+  }
+};
+
+const isTenantAdminOrSuperAdmin = async (req, res, next) => {
+  try {
+    if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
+      throw new Error();
+    }
+    next();
+  } catch (error) {
+    res.status(403).send({ error: 'Access denied. Tenant admin or super admin privileges required.' });
+  }
+};
+
+module.exports = {
+  authMiddleware,
+  isAdmin,
+  isTenantAdminOrSuperAdmin
+};

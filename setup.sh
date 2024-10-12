@@ -63,16 +63,15 @@ echo "Configuring environment variables..."
 rm -f .env
 touch .env
 
+# Configure MongoDB
+echo "Configuring MongoDB..."
 prompt_env_var "MONGODB_URI" "MongoDB URI" "mongodb://mongo:27017/it_inventory"
-prompt_env_var "JWT_SECRET" "JWT Secret" "$(openssl rand -base64 32)"
-prompt_env_var "STRIPE_SECRET_KEY" "Stripe Secret Key"
-prompt_env_var "STRIPE_PUBLISHABLE_KEY" "Stripe Publishable Key"
-prompt_env_var "STRIPE_WEBHOOK_SECRET" "Stripe Webhook Secret"
-prompt_env_var "SMTP_HOST" "SMTP Host"
-prompt_env_var "SMTP_PORT" "SMTP Port" "587"
-prompt_env_var "SMTP_USER" "SMTP User"
-prompt_env_var "SMTP_PASS" "SMTP Password"
-prompt_env_var "EMAIL_FROM" "From Email Address"
+
+# Generate and save JWT Secret
+JWT_SECRET=$(openssl rand -base64 32)
+echo "JWT_SECRET=$JWT_SECRET" >> .env
+echo "Your JWT Secret is: $JWT_SECRET"
+echo "Please save this secret securely. You will need it for admin configuration."
 
 # Copy .env to frontend directory
 echo "Copying .env to frontend directory..."
@@ -85,19 +84,6 @@ docker-compose up -d --build || error "Failed to build and start Docker containe
 echo "Setup complete. Please log out and log back in for the docker group changes to take effect."
 echo "Your application should now be running. Access the frontend at http://localhost"
 
-# Provide instructions for Stripe webhook setup
-echo ""
-echo "Important: Set up Stripe webhook"
-echo "1. Go to your Stripe Dashboard: https://dashboard.stripe.com/webhooks"
-echo "2. Click 'Add endpoint'"
-echo "3. Enter the following URL: http://your-domain.com/api/subscriptions/webhook"
-echo "4. Select the following events:"
-echo "   - customer.subscription.updated"
-echo "   - customer.subscription.deleted"
-echo "   - customer.created"
-echo "5. Click 'Add endpoint'"
-echo "6. Copy the 'Signing secret' and update the STRIPE_WEBHOOK_SECRET in your .env file"
-
 # Prompt to run database seeding script
 read -p "Do you want to seed the database with initial data? (y/n) " -n 1 -r
 echo
@@ -108,3 +94,4 @@ fi
 
 echo "Setup and configuration complete. Your SaaS IT Inventory Application is ready to use!"
 echo "Please review the README.md file for additional configuration steps and usage instructions."
+echo "Remember to configure payment and SMTP settings in the admin and tenant setup menus within the application."

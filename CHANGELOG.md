@@ -23,6 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented AdminHelpPortal component for administrators to manage help documents and respond to user requests
   - Added notification system for new help requests and updates to existing requests
   - Integrated help request management into the admin dashboard
+- Automated JWT Secret generation in setup process
+- New section in AdminInstructions.md for configuring payment (Stripe) and SMTP settings
+- Implemented SMTP settings management for both admins and tenants
+  - Added SMTP settings fields to Tenant model
+  - Created new route for updating SMTP settings
+  - Implemented role-based access control for SMTP settings management
+- Implemented Stripe settings management for admins
+  - Added Stripe settings fields to Tenant model
+  - Created new route for updating Stripe settings
+  - Implemented admin-only access control for Stripe settings management
 
 ### Changed
 - Updated Navigation component to include links to Reports section and Help & Support Portal
@@ -40,6 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced focus management for modal dialogs
 - Updated AdminInstructions.md to include detailed information on managing the Help and Support Portal
 - Enhanced UserInstructions.md with guidelines on using the new Help and Support Portal features
+- Modified setup process to exclude payment and SMTP configuration, moving these to post-installation admin setup
+- Updated README.md to reflect changes in the installation and setup process
+- Enhanced role-based access control in authMiddleware
+  - Added isTenantAdminOrSuperAdmin function for more granular access control
+  - Updated existing routes to use appropriate middleware for access control
 
 ### Fixed
 - Various bug fixes and performance improvements
