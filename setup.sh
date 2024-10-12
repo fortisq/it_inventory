@@ -173,18 +173,6 @@ log "Encryption Key generated and saved to .env"
 log "Copying .env to frontend directory..."
 cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to frontend directory"
 
-# Search for and update getUpdates import
-log "Searching for and updating getUpdates import..."
-frontend_dir="saas-it-inventory-frontend/src"
-file_with_get_updates=$(grep -r "import.*getUpdates.*from '../services/api'" $frontend_dir | cut -d: -f1)
-
-if [ -n "$file_with_get_updates" ]; then
-    log "Updating $file_with_get_updates"
-    sed -i 's|import.*getUpdates.*from "../services/api"|import { getSystemUpdates as getUpdates } from "../services/api"|' "$file_with_get_updates"
-else
-    log "No file found with getUpdates import. Skipping update."
-fi
-
 # Build and start the containers
 log "Building and starting Docker containers..."
 docker-compose up -d --build || error "Failed to build and start Docker containers"

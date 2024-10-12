@@ -78,4 +78,7 @@ export const getUserNotifications = () => api.get('/help/notifications/user');
 export const markAdminNotificationAsRead = (id) => api.put(`/help/notifications/admin/${id}`);
 export const markUserNotificationAsRead = (id) => api.put(`/help/notifications/user/${id}`);
 
+// Add this line to export getUpdates as an alias for getSystemUpdates
+export const getUpdates = getSystemUpdates;
+
 export default api;
