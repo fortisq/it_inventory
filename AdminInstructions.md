@@ -125,6 +125,48 @@
 3. Color contrast has been improved for better readability.
 4. A new "High Contrast" mode can be enabled in the user settings for users who need it.
 
+## Help and Support Management
+
+1. Navigate to "Help & Support Management" in the admin panel.
+2. Here you can:
+   - View and manage help documents
+   - Respond to user help requests
+   - Create and edit system update announcements
+
+### Managing Help Documents
+
+1. Click on "Manage Help Documents" in the Help & Support Management section.
+2. You can:
+   - View existing help documents
+   - Create new help documents: Click "Add Document" and fill in the title, content, and category
+   - Edit existing documents: Click on a document to modify its content
+   - Delete documents: Use the delete option, but be cautious as this may affect users
+
+### Responding to Help Requests
+
+1. Click on "Manage Help Requests" in the Help & Support Management section.
+2. You'll see a list of all help requests, sorted by status and priority.
+3. Click on a request to view its details and respond.
+4. You can:
+   - Update the status of the request (Open, In Progress, Resolved, Closed)
+   - Add internal notes visible only to admins
+   - Respond to the user
+   - Assign the request to a specific admin
+
+### Creating System Update Announcements
+
+1. Click on "Manage System Updates" in the Help & Support Management section.
+2. You can:
+   - Create new system update announcements
+   - Edit existing announcements
+   - Delete outdated announcements
+
+### Notifications
+
+- When there are new help requests, you'll see a red badge with a number on the "Admin" menu item.
+- Click on "Help & Support Management" to view and manage these new requests.
+- Respond to requests promptly to maintain good user support.
+
 ## Troubleshooting
 
 1. Check the "System Logs" section for any error messages or warnings.

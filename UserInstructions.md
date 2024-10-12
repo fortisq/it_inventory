@@ -15,6 +15,7 @@ The main navigation menu provides access to all sections of the application:
 - Asset Management: Add, edit, and delete assets
 - Software Subscriptions: Manage software licenses and subscriptions
 - Reports: Generate and view various reports
+- Help & Support: Access help documents and submit support requests
 - My Profile: Update your user information
 - Admin Panel (for admin users only): Access administrative functions
 
@@ -30,51 +31,113 @@ On smaller screens, the navigation menu will be collapsed. To access the menu:
 
 The Dashboard provides a quick overview of your IT inventory and key metrics.
 
-- You'll see a personalized greeting at the top of the dashboard.
-- The main menu items are displayed as clickable cards for easy access.
-- Your profile link and logout button are located at the bottom of the dashboard.
+## Inventory Management
 
-### Logging Out
+### Viewing Inventory
 
-1. Click the "Logout" button at the bottom of the dashboard.
-2. You'll see a loading spinner while the logout process completes.
-3. Once logged out, you'll be redirected to the login page.
+1. Navigate to the "Inventory" section from the main menu.
+2. You'll see a list of all inventory items, including assets and software.
+3. Use the search and filter options to find specific items.
 
-## Managing Assets
+### Adding New Items
 
-[... existing content for Managing Assets ...]
+1. In the Inventory section, click "Add New Item".
+2. Choose the type of item (Asset or Software).
+3. Fill in the required information.
+4. Click "Save" to add the item to your inventory.
 
-## Managing Software Subscriptions
+### Editing and Deleting Items
 
-[... existing content for Managing Software Subscriptions ...]
+1. In the inventory list, click on an item to view its details.
+2. Click "Edit" to modify the item's information.
+3. To delete an item, click "Delete" and confirm your action.
+
+## Asset Management
+
+### Adding a New Asset
+
+1. Navigate to the "Asset Management" section.
+2. Click on "Add Asset".
+3. Fill in the required information (name, type, serial number, etc.).
+4. Click "Add Asset" to save the new asset to the inventory.
+
+### Updating Asset Information
+
+1. In the asset list, click the "Edit" button next to the asset you want to update.
+2. Edit the information as needed.
+3. Click "Save" to update the asset.
+
+## Software Subscription Management
+
+### Adding a New Subscription
+
+1. Navigate to the "Software Subscriptions" section.
+2. Click on "Add New Subscription".
+3. Enter the subscription details (name, vendor, start date, expiry date, etc.).
+4. Click "Save" to add the subscription.
+
+### Renewing or Cancelling Subscriptions
+
+1. In the Software Subscriptions list, find the subscription you want to manage.
+2. Click "Renew" to extend the subscription, or "Cancel" to end it.
+3. Confirm your action when prompted.
 
 ## Generating Reports
 
-[... existing content for Generating Reports ...]
+1. Navigate to the "Reports" section from the main menu.
+2. Choose the type of report you want to generate.
+3. Set any filters or parameters as needed.
+4. Click "Generate Report".
+5. View the report on screen or download it in your preferred format.
 
-## Managing Your Profile
+## Help and Support Portal
 
-1. Click on "My Profile" in the navigation menu or the profile link at the bottom of the dashboard.
-2. Update your personal information, email, or password.
-3. Click "Save Changes" to update your profile.
+1. Click on "Help & Support" in the main navigation menu.
+2. In the Help and Support Portal, you can:
+   - Browse help documents organized by category
+   - Search for specific help topics
+   - Submit new help requests
+   - View the status of your existing help requests
+   - See system updates and announcements
 
-## Accessibility Features
+### Submitting a Help Request
 
-- The application supports keyboard navigation. Use the Tab key to move between interactive elements and Enter to activate them.
-- Screen readers are supported with appropriate ARIA labels and descriptions.
-- High contrast mode is available in the user settings for better visibility.
-- The responsive design ensures the application is usable on various devices and screen sizes.
+1. In the Help and Support Portal, click on "Submit New Request".
+2. Fill out the form with a subject and detailed description of your issue or question.
+3. Click "Submit" to send your request.
+4. You'll receive notifications when there are updates to your request.
 
-## Notifications and Messages
+### Viewing Help Request Status
 
-- Success messages (e.g., after updating your profile) will appear at the top of the screen.
-- These messages will automatically dismiss after 5 seconds, or you can click to dismiss them manually.
+1. In the Help and Support Portal, click on "My Requests".
+2. You'll see a list of all your submitted requests with their current status.
+3. Click on a request to view its details and any responses from the support team.
 
-## Getting Help
+## Notifications
 
-If you encounter any issues or have questions:
-1. Check the FAQ section accessible from the main menu.
-2. For technical issues, use the "Contact Support" option in the application.
-3. For immediate assistance, contact your system administrator.
+- When you have new notifications, you'll see a red badge with a number on the "Help & Support" menu item.
+- These notifications indicate updates to your help requests or important system announcements.
+- Click on the "Help & Support" menu item to view and manage your notifications.
+
+## My Profile
+
+1. Click on "My Profile" in the navigation menu.
+2. Here you can:
+   - Update your personal information
+   - Change your password
+   - Set notification preferences
+
+## Logging Out
+
+1. Click on your username in the top right corner of the screen.
+2. Select "Logout" from the dropdown menu.
 
 Remember to log out when you're finished using the application, especially on shared computers.
+
+## Troubleshooting
+
+If you encounter any issues while using the application:
+
+1. Check the Help & Support Portal for relevant help documents.
+2. If you can't find a solution, submit a help request through the portal.
+3. For urgent issues, contact your system administrator directly.

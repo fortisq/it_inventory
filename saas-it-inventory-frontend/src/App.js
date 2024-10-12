@@ -16,6 +16,8 @@ import Reports from './components/Reports';
 import SystemHealth from './components/SystemHealth';
 import Profile from './components/Profile';
 import AdminPanel from './components/AdminPanel';
+import HelpSupportPortal from './components/HelpSupportPortal';
+import AdminHelpPortal from './components/AdminHelpPortal';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -61,6 +63,7 @@ function App() {
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/system-health" element={<SystemHealth />} />
+                <Route path="/help-support" element={<HelpSupportPortal />} />
               </Route>
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminPanel />} />
@@ -68,6 +71,7 @@ function App() {
                 <Route path="/admin/tenants" element={<TenantManagement />} />
                 <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/admin/system-health" element={<SystemHealth />} />
+                <Route path="/admin/help-support" element={<AdminHelpPortal />} />
               </Route>
               <Route path="/" element={<Navigate to="/login" />} />
             </Routes>

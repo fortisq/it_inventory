@@ -26,6 +26,7 @@ const statsRoutes = require('./routes/statsRoutes');
 const softwareSubscriptionRoutes = require('./routes/softwareSubscriptionRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const helpRoutes = require('./routes/helpRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -37,6 +38,7 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/software-subscriptions', softwareSubscriptionRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/help', helpRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

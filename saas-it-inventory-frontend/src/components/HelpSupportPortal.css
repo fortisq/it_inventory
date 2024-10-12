@@ -1,0 +1,118 @@
+.help-support-portal {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.help-support-portal h2 {
+  color: #333;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.help-support-portal h3 {
+  color: #444;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.help-documents ul,
+.updates ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.help-documents li,
+.updates li {
+  margin-bottom: 10px;
+}
+
+.help-documents a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.help-documents a:hover {
+  text-decoration: underline;
+}
+
+.updates li strong {
+  margin-right: 10px;
+}
+
+.help-request-form form {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.help-request-form div {
+  margin-bottom: 15px;
+}
+
+.help-request-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.help-request-form input,
+.help-request-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.help-request-form textarea {
+  height: 100px;
+}
+
+.help-request-form button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.help-request-form button:hover {
+  background-color: #0056b3;
+}
+
+.help-request-form button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error,
+.success {
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+@media (max-width: 768px) {
+  .help-support-portal {
+    padding: 10px;
+  }
+
+  .help-request-form form {
+    padding: 15px;
+  }
+}

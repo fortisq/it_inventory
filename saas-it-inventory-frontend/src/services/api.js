@@ -57,4 +57,25 @@ export const getReports = () => api.get('/reports');
 export const getReport = (id) => api.get(`/reports/${id}`);
 export const generateReport = (id) => api.post(`/reports/${id}/generate`);
 
+// Help and Support
+export const getHelpDocuments = () => api.get('/help/documents');
+export const getHelpDocument = (id) => api.get(`/help/documents/${id}`);
+export const createHelpDocument = (documentData) => api.post('/help/documents', documentData);
+export const updateHelpDocument = (id, documentData) => api.put(`/help/documents/${id}`, documentData);
+export const deleteHelpDocument = (id) => api.delete(`/help/documents/${id}`);
+
+export const getHelpRequests = () => api.get('/help/requests');
+export const getHelpRequest = (id) => api.get(`/help/requests/${id}`);
+export const createHelpRequest = (requestData) => api.post('/help/requests', requestData);
+export const updateHelpRequest = (id, requestData) => api.put(`/help/requests/${id}`, requestData);
+export const addCommentToHelpRequest = (id, commentData) => api.post(`/help/requests/${id}/comments`, commentData);
+
+export const getSystemUpdates = () => api.get('/help/updates');
+
+// Notifications
+export const getAdminNotifications = () => api.get('/help/notifications/admin');
+export const getUserNotifications = () => api.get('/help/notifications/user');
+export const markAdminNotificationAsRead = (id) => api.put(`/help/notifications/admin/${id}`);
+export const markUserNotificationAsRead = (id) => api.put(`/help/notifications/user/${id}`);
+
 export default api;
