@@ -4,6 +4,9 @@ FROM node:20-alpine AS build
 # Set working directory
 WORKDIR /app
 
+# Set environment variable for legacy OpenSSL provider
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 # Update npm to the latest version and print versions
 RUN npm install -g npm@latest && \
     echo "Node.js version: $(node -v)" && \
