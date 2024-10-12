@@ -110,19 +110,33 @@ fi
 # Navigate to the project root directory
 cd "$(dirname "$0")" || error "Failed to navigate to the project directory"
 
-# Regenerate package-lock.json
-log "Regenerating package-lock.json..."
+# Regenerate package-lock.json for backend
+log "Regenerating package-lock.json for backend..."
 cd saas-it-inventory || error "Failed to navigate to saas-it-inventory directory"
 rm -f package-lock.json
-npm install || error "Failed to regenerate package-lock.json"
+npm install || error "Failed to regenerate package-lock.json for backend"
 cd ..
 
-# Verify package.json content
-log "Verifying package.json content..."
+# Regenerate package-lock.json for frontend
+log "Regenerating package-lock.json for frontend..."
+cd saas-it-inventory-frontend || error "Failed to navigate to saas-it-inventory-frontend directory"
+rm -f package-lock.json
+npm install || error "Failed to regenerate package-lock.json for frontend"
+cd ..
+
+# Verify package.json content for backend
+log "Verifying backend package.json content..."
 if [ ! -f saas-it-inventory/package.json ]; then
     error "package.json not found in saas-it-inventory directory"
 fi
-cat saas-it-inventory/package.json || error "Failed to read package.json"
+cat saas-it-inventory/package.json || error "Failed to read backend package.json"
+
+# Verify package.json content for frontend
+log "Verifying frontend package.json content..."
+if [ ! -f saas-it-inventory-frontend/package.json ]; then
+    error "package.json not found in saas-it-inventory-frontend directory"
+fi
+cat saas-it-inventory-frontend/package.json || error "Failed to read frontend package.json"
 
 # Backup existing .env file
 if [ -f .env ]; then
@@ -157,9 +171,7 @@ cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to fronten
 
 # Build and start the containers
 log "Building and starting Docker containers..."
-cd saas-it-inventory || error "Failed to navigate to saas-it-inventory directory"
 $SUDO docker-compose up -d --build || error "Failed to build and start Docker containers"
-cd ..
 
 log "Waiting for services to start..."
 sleep 10
