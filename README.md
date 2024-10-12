@@ -7,6 +7,14 @@ This application consists of a frontend, backend, and database for managing IT i
 Dan Bressers, NIT Solutions Ltd
 Date: 10/11/2024
 
+## Copyright
+
+Copyright (c) 2024 Dan Bressers, NIT Solutions Ltd
+
+This project is protected by copyright law. All rights reserved. For more details, please see the [LICENSE.md](LICENSE.md) file.
+
+Key files in this project contain copyright notices. When contributing to this project, please maintain these notices and add similar notices to new files as appropriate.
+
 ## Features
 
 - IT asset and license management
@@ -188,7 +196,7 @@ If you encounter any issues during the installation or running of the applicatio
 
 ## Contributing
 
-Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
