@@ -37,6 +37,11 @@ if [ "$(id -u)" = "0" ]; then
     error "This script should not be run as root. Please run as a normal user."
 fi
 
+# Add current user to docker group and refresh group permissions
+log "Adding current user to docker group and refreshing permissions..."
+sudo usermod -aG docker $USER
+newgrp docker
+
 # Update and upgrade the system
 log "Updating and upgrading the system..."
 sudo apt-get update && sudo apt-get upgrade -y || error "Failed to update and upgrade the system"
@@ -66,7 +71,7 @@ if ! command_exists docker; then
     sudo apt-get install -y docker.io || error "Failed to install Docker"
 else
     log "Docker is already installed. Checking version..."
-    docker_version=$(sudo docker --version | awk '{print $3}' | cut -d',' -f1)
+    docker_version=$(docker --version | awk '{print $3}' | cut -d',' -f1)
     if [[ "$docker_version" < "20.10.0" ]]; then
         error "Docker version 20.10.0 or higher is required. Current version: $docker_version"
     fi
@@ -79,7 +84,7 @@ if ! command_exists docker-compose; then
     sudo chmod +x /usr/local/bin/docker-compose || error "Failed to make Docker Compose executable"
 else
     log "Docker Compose is already installed. Checking version..."
-    compose_version=$(sudo docker-compose --version | awk '{print $3}' | cut -d',' -f1)
+    compose_version=$(docker-compose --version | awk '{print $3}' | cut -d',' -f1)
     if [[ "$compose_version" < "1.29.2" ]]; then
         error "Docker Compose version 1.29.2 or higher is required. Current version: $compose_version"
     fi
@@ -89,21 +94,6 @@ fi
 log "Starting Docker service..."
 sudo systemctl start docker || error "Failed to start Docker service"
 sudo systemctl enable docker || error "Failed to enable Docker service"
-
-# Add current user to docker group
-log "Adding current user to docker group..."
-sudo usermod -aG docker $USER || error "Failed to add user to docker group"
-
-log "You have been added to the docker group. Please log out and log back in for the changes to take effect."
-log "Alternatively, you can run the following command to apply the changes without logging out:"
-log "newgrp docker"
-
-# Apply group changes without logout
-log "Applying group changes..."
-if ! groups | grep -q docker; then
-    exec sg docker -c "$0"
-    exit 0
-fi
 
 # Navigate to the project root directory
 cd "$(dirname "$0")" || error "Failed to navigate to the project directory"
