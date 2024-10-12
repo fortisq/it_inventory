@@ -4,14 +4,14 @@ FROM node:16-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Update npm to the latest version compatible with Node.js 16
-RUN npm install -g npm@8
+# Update npm to the latest stable version
+RUN npm install -g npm@10.6.0
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 RUN npm install @types/node
 
 # Copy the rest of the application code
