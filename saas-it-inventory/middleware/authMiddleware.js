@@ -10,49 +10,82 @@
 
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const logger = require('../utils/logger');
+
+class AuthError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.name = 'AuthError';
+    this.statusCode = statusCode;
+  }
+}
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.header('Authorization').replace('Bearer ', '');
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      throw new AuthError('No token provided', 401);
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({ _id: decoded.userId, tenant: req.tenant._id });
 
     if (!user) {
-      throw new Error();
+      throw new AuthError('User not found', 401);
     }
 
     req.token = token;
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).send({ error: 'Please authenticate.' });
+    logger.error('Authentication error:', error);
+    if (error instanceof AuthError) {
+      res.status(error.statusCode).send({ error: error.message });
+    } else {
+      res.status(401).send({ error: 'Please authenticate.' });
+    }
   }
 };
 
 const isAdmin = async (req, res, next) => {
   try {
     if (req.user.role !== 'admin') {
-      throw new Error();
+      throw new AuthError('Access denied. Admin privileges required.', 403);
     }
     next();
   } catch (error) {
-    res.status(403).send({ error: 'Access denied. Admin privileges required.' });
+    logger.error('Admin authorization error:', error);
+    res.status(error.statusCode || 403).send({ error: error.message });
   }
 };
 
 const isTenantAdminOrSuperAdmin = async (req, res, next) => {
   try {
     if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
-      throw new Error();
+      throw new AuthError('Access denied. Tenant admin or super admin privileges required.', 403);
     }
     next();
   } catch (error) {
-    res.status(403).send({ error: 'Access denied. Tenant admin or super admin privileges required.' });
+    logger.error('Tenant admin or super admin authorization error:', error);
+    res.status(error.statusCode || 403).send({ error: error.message });
+  }
+};
+
+const belongsToTenant = async (req, res, next) => {
+  try {
+    if (req.user.tenant.toString() !== req.params.tenantId) {
+      throw new AuthError('Access denied. User does not belong to this tenant.', 403);
+    }
+    next();
+  } catch (error) {
+    logger.error('Tenant authorization error:', error);
+    res.status(error.statusCode || 403).send({ error: error.message });
   }
 };
 
 module.exports = {
   authMiddleware,
   isAdmin,
-  isTenantAdminOrSuperAdmin
+  isTenantAdminOrSuperAdmin,
+  belongsToTenant
 };

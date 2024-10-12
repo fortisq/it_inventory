@@ -29,6 +29,20 @@ Key files in this project contain copyright notices. When contributing to this p
 - Tenant-specific SMTP configuration for customized email settings
 - Admin-controlled Stripe settings management for flexible payment processing
 
+### Enhanced Security Features
+- Improved encryption for sensitive data (SMTP passwords, Stripe API keys)
+- Enhanced input validation to prevent injection attacks
+- Improved error handling and logging for better debugging and security analysis
+
+### Advanced Role-Based Access Control
+- Super Admin: Full access to all features and can manage all tenants
+- Admin: Can manage their own tenant's settings and users
+- User: Has limited access based on their assigned permissions
+
+### Performance Improvements
+- Pagination support for large datasets, particularly when fetching lists of tenants, assets, or subscriptions
+- Optimized database queries for faster data retrieval
+
 ## Prerequisites
 
 - A Linux-based system (Ubuntu recommended)
@@ -54,7 +68,7 @@ Key files in this project contain copyright notices. When contributing to this p
 
 4. Follow the prompts to enter your MongoDB URI.
 
-5. The script will generate a JWT Secret. Make sure to save this secret securely, as you'll need it for admin configuration.
+5. The script will generate a JWT Secret and an Encryption Key. Make sure to save these securely, as you'll need them for admin configuration and data encryption.
 
 6. Log out and log back in for the Docker group changes to take effect.
 

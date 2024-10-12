@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 
 const tenantSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -15,20 +16,32 @@ const tenantSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
   smtpSettings: {
     host: { type: String },
-    port: { type: Number },
+    port: { type: Number, min: 1, max: 65535 },
     secure: { type: Boolean, default: false },
     auth: {
       user: { type: String },
-      pass: { type: String }
+      pass: { type: String, set: encryptField, get: decryptField }
     },
-    from: { type: String }
+    from: { type: String, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }
   },
   stripeSettings: {
     publishableKey: { type: String },
-    secretKey: { type: String },
-    webhookSecret: { type: String }
+    secretKey: { type: String, set: encryptField, get: decryptField },
+    webhookSecret: { type: String, set: encryptField, get: decryptField }
   }
 });
+
+function encryptField(value) {
+  if (!value) return;
+  const cipher = crypto.createCipher('aes-256-cbc', process.env.ENCRYPTION_KEY);
+  return cipher.update(value, 'utf8', 'hex') + cipher.final('hex');
+}
+
+function decryptField(value) {
+  if (!value) return;
+  const decipher = crypto.createDecipher('aes-256-cbc', process.env.ENCRYPTION_KEY);
+  return decipher.update(value, 'hex', 'utf8') + decipher.final('utf8');
+}
 
 tenantSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
@@ -60,6 +73,19 @@ tenantSchema.methods.hasReachedUserLimit = function() {
 // Method to check if the tenant has reached its asset limit
 tenantSchema.methods.hasReachedAssetLimit = function() {
   return this.assetCount >= this.assetLimit;
+};
+
+// Method to validate SMTP settings
+tenantSchema.methods.validateSMTPSettings = async function() {
+  const nodemailer = require('nodemailer');
+  try {
+    const transporter = nodemailer.createTransport(this.smtpSettings);
+    await transporter.verify();
+    return true;
+  } catch (error) {
+    console.error('SMTP validation error:', error);
+    return false;
+  }
 };
 
 module.exports = mongoose.model('Tenant', tenantSchema);

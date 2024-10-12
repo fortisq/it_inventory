@@ -33,6 +33,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added Stripe settings fields to Tenant model
   - Created new route for updating Stripe settings
   - Implemented admin-only access control for Stripe settings management
+- Enhanced security for sensitive data
+  - Implemented encryption for SMTP and Stripe credentials in the Tenant model
+  - Added automatic generation of encryption key during setup
+- Improved input validation using express-validator in tenant routes
+- Added pagination for fetching all tenants
+- Implemented SMTP settings validation when updating
+- Added new belongsToTenant middleware for tenant-specific operations
+- Improved error handling with custom AuthError class in authentication middleware
+- Added logging for better debugging and error tracking
+- Enhanced installation system (setup.sh):
+  - Added cleanup function and trap to handle script interruptions and errors
+  - Implemented logging function for consistent and timestamped log messages
+  - Added version checks for Docker and Docker Compose
+  - Implemented backup mechanism for existing .env file
+  - Added MongoDB connection validation after container startup
+  - Replaced npm install with npm ci for more reliable dependency installation
 
 ### Changed
 - Updated Navigation component to include links to Reports section and Help & Support Portal
@@ -55,9 +71,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced role-based access control in authMiddleware
   - Added isTenantAdminOrSuperAdmin function for more granular access control
   - Updated existing routes to use appropriate middleware for access control
+- Refactored tenant routes for better organization and error handling
+- Updated setup.sh script:
+  - Improved error handling and logging
+  - Enhanced security considerations and warnings
+  - Added more detailed progress information during installation
 
 ### Fixed
 - Various bug fixes and performance improvements
+- Improved error handling in authentication middleware and tenant routes
+- Enhanced robustness and reliability of the installation process
 
 ## [1.0.0] - 2023-05-01
 
