@@ -98,6 +98,13 @@ fi
 # Navigate to the project root directory
 cd "$(dirname "$0")" || error "Failed to navigate to the project directory"
 
+# Verify package.json content
+log "Verifying package.json content..."
+if [ ! -f saas-it-inventory/package.json ]; then
+    error "package.json not found in saas-it-inventory directory"
+fi
+cat saas-it-inventory/package.json || error "Failed to read package.json"
+
 # Backup existing .env file
 if [ -f .env ]; then
     log "Backing up existing .env file..."
