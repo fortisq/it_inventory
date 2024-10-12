@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented backup mechanism for existing .env file
   - Added MongoDB connection validation after container startup
   - Replaced npm install with npm ci for more reliable dependency installation
+  - Added automatic installation of Node.js and npm if not present on the system
 
 ### Changed
 - Updated Navigation component to include links to Reports section and Help & Support Portal
@@ -77,11 +78,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced security considerations and warnings
   - Added more detailed progress information during installation
   - Automated MongoDB URI configuration, removing the need for user input
+  - Added checks and installation for Node.js and npm dependencies
 
 ### Fixed
 - Various bug fixes and performance improvements
 - Improved error handling in authentication middleware and tenant routes
 - Enhanced robustness and reliability of the installation process
+- Resolved issue with missing npm command in setup script by adding Node.js and npm installation
 
 ## [1.0.0] - 2023-05-01
 

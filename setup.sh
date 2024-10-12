@@ -36,6 +36,18 @@ fi
 log "Updating and upgrading the system..."
 sudo apt-get update && sudo apt-get upgrade -y || error "Failed to update and upgrade the system"
 
+# Install Node.js and npm
+if ! command_exists node || ! command_exists npm; then
+    log "Installing Node.js and npm..."
+    sudo apt-get install -y nodejs npm || error "Failed to install Node.js and npm"
+else
+    log "Node.js and npm are already installed. Checking versions..."
+    node_version=$(node --version)
+    npm_version=$(npm --version)
+    log "Node.js version: $node_version"
+    log "npm version: $npm_version"
+fi
+
 # Install Docker
 if ! command_exists docker; then
     log "Installing Docker..."
