@@ -109,12 +109,6 @@ if [ ! -f saas-it-inventory/package.json ]; then
 fi
 cat saas-it-inventory/package.json || error "Failed to read package.json"
 
-# Attempt to install dependencies locally
-log "Attempting to install dependencies locally..."
-cd saas-it-inventory
-npm ci --verbose || error "Failed to install dependencies locally"
-cd ..
-
 # Backup existing .env file
 if [ -f .env ]; then
     log "Backing up existing .env file..."
@@ -148,7 +142,9 @@ cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to fronten
 
 # Build and start the containers
 log "Building and starting Docker containers..."
+cd saas-it-inventory || error "Failed to navigate to saas-it-inventory directory"
 $SUDO docker-compose up -d --build || error "Failed to build and start Docker containers"
+cd ..
 
 log "Waiting for services to start..."
 sleep 10

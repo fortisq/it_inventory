@@ -4,17 +4,11 @@ FROM node:14.17.6-alpine AS builder
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Install a specific version of npm
-RUN npm install -g npm@6.14.15
-
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Debug: Display content of package.json and npm version
-RUN cat package.json && echo "NPM Version: $(npm -v)"
-
-# Install all dependencies (including devDependencies)
-RUN npm ci --verbose
+# Install dependencies
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
@@ -24,9 +18,6 @@ FROM node:14.17.6-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app
-
-# Install a specific version of npm
-RUN npm install -g npm@6.14.15
 
 # Copy built node modules and compiled code from the build stage
 COPY --from=builder /usr/src/app .
