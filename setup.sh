@@ -108,6 +108,12 @@ fi
 # Navigate to the project root directory
 cd "$(dirname "$0")" || error "Failed to navigate to the project directory"
 
+# Install frontend dependencies
+log "Installing frontend dependencies..."
+cd saas-it-inventory-frontend || error "Failed to navigate to frontend directory"
+npm install || error "Failed to install frontend dependencies"
+cd ..
+
 # Regenerate package-lock.json for backend
 log "Regenerating package-lock.json for backend..."
 cd saas-it-inventory || error "Failed to navigate to saas-it-inventory directory"
