@@ -25,6 +25,7 @@ Key files in this project contain copyright notices. When contributing to this p
 - Email notifications for subscription events, warranty expirations, and software subscription renewals
 - Reports and dashboards for asset and subscription insights
 - System Health monitoring for administrators
+- Help and Support Portal for users and administrators
 
 ## Prerequisites
 
@@ -129,6 +130,15 @@ The System Health feature allows administrators to:
 - Monitor database statistics and health
 - Check the versions of dependencies
 - View system information such as CPU cores, memory usage, and uptime
+
+### Help and Support Portal
+
+The Help and Support Portal feature provides:
+- Access to help documents organized by category
+- Ability for users to submit help requests
+- Admin interface for managing help documents and responding to user requests
+- Notification system for new help requests and updates
+- System update announcements for users
 
 ## Billing System
 

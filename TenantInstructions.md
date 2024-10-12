@@ -103,4 +103,27 @@ The main navigation menu provides access to all sections of the application:
 3. You can access user guides and video tutorials from the "Help" section in the main menu.
 4. For immediate assistance, contact your system administrator or our support team.
 
+### Help and Support Portal
+
+5. Access the Help and Support Portal by clicking on the "Help & Support" link in the main navigation menu.
+6. In the Help and Support Portal, you can:
+   - Browse help documents organized by category
+   - Search for specific help topics using the search function
+   - Submit new help requests for issues or questions
+   - View the status of your existing help requests
+   - Access system updates and announcements
+
+#### Submitting a Help Request
+7. In the Help and Support Portal, click on "Submit New Request".
+8. Fill out the form with your question or issue details.
+9. Click "Submit" to send your request to our support team.
+
+#### Managing Help Requests
+10. To view your existing help requests, click on "My Requests" in the Help and Support Portal.
+11. You can see the status of each request and any responses from the support team.
+12. You'll receive notifications when there are updates to your help requests.
+
+#### System Updates and Announcements
+13. Check the "System Updates" section in the Help and Support Portal regularly for important announcements about new features, maintenance schedules, and other updates.
+
 Remember, as a tenant admin, you're responsible for managing your organization's data and users within the application. Always ensure you follow best practices for data management, user access control, and security.

@@ -79,3 +79,26 @@ A: First, check this FAQ and the user documentation. If the issue persists, cont
 A: Currently, we offer a responsive web application that works on mobile devices. A dedicated mobile app is in our product roadmap.
 
 If you have any questions not covered here, please don't hesitate to contact our support team.
+
+## Help and Support Portal
+
+### Q: What is the Help and Support Portal?
+A: The Help and Support Portal is a centralized platform where users can access help documents, submit support requests, and view system updates. It's designed to provide quick assistance and improve user experience.
+
+### Q: How do I access the Help and Support Portal?
+A: You can access the Help and Support Portal by clicking on the "Help & Support" link in the main navigation menu.
+
+### Q: Can I search for specific help topics?
+A: Yes, the Help and Support Portal includes a search function that allows you to find specific help documents or topics quickly.
+
+### Q: How do I submit a help request?
+A: In the Help and Support Portal, click on "Submit New Request", fill out the form with your question or issue details, and click "Submit". Our support team will respond to your request as soon as possible.
+
+### Q: How can I check the status of my help request?
+A: In the Help and Support Portal, click on "My Requests" to view a list of all your submitted requests and their current status.
+
+### Q: Will I be notified of updates to my help request?
+A: Yes, you'll receive notifications when there are updates to your help requests. These notifications will appear in the application and may also be sent via email, depending on your notification settings.
+
+### Q: Can I view system updates and announcements in the Help and Support Portal?
+A: Yes, the Help and Support Portal includes a section for system updates and announcements. This keeps you informed about new features, maintenance schedules, and other important information.
