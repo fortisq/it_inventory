@@ -12,8 +12,10 @@ import UserManagement from './components/UserManagement';
 import SubscriptionManagement from './components/SubscriptionManagement';
 import AssetManagement from './components/AssetManagement';
 import SoftwareSubscriptionManagement from './components/SoftwareSubscriptionManagement';
-import ReportsAndDashboards from './components/ReportsAndDashboards';
+import Reports from './components/Reports';
 import SystemHealth from './components/SystemHealth';
+import Profile from './components/Profile';
+import AdminPanel from './components/AdminPanel';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -56,10 +58,13 @@ function App() {
                 <Route path="/subscription" element={<SubscriptionManagement />} />
                 <Route path="/assets" element={<AssetManagement />} />
                 <Route path="/software-subscriptions" element={<SoftwareSubscriptionManagement />} />
-                <Route path="/reports" element={<ReportsAndDashboards />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/system-health" element={<SystemHealth />} />
               </Route>
               <Route element={<AdminRoute />}>
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/tenants" element={<TenantManagement />} />
                 <Route path="/admin/users" element={<UserManagement />} />
                 <Route path="/admin/system-health" element={<SystemHealth />} />

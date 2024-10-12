@@ -11,8 +11,15 @@ const Navigation = () => {
     setShowAdminMenu(!showAdminMenu);
   };
 
+  const handleKeyDown = (e, action) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  };
+
   return (
-    <nav className="navigation">
+    <nav className="navigation" aria-label="Main Navigation">
       <ul>
         {isAuthenticated ? (
           <>
@@ -21,20 +28,36 @@ const Navigation = () => {
             <li><Link to="/assets">Asset Management</Link></li>
             <li><Link to="/software-subscriptions">Software Subscriptions</Link></li>
             <li><Link to="/subscription">Subscription</Link></li>
-            <li><Link to="/reports">Reports & Dashboards</Link></li>
+            <li><Link to="/reports">Reports</Link></li>
+            <li><Link to="/profile">My Profile</Link></li>
             {user && user.role === 'admin' && (
               <li className="admin-menu">
-                <button onClick={toggleAdminMenu}>Admin</button>
+                <button 
+                  onClick={toggleAdminMenu} 
+                  aria-haspopup="true" 
+                  aria-expanded={showAdminMenu}
+                  onKeyDown={(e) => handleKeyDown(e, toggleAdminMenu)}
+                >
+                  Admin
+                </button>
                 {showAdminMenu && (
-                  <ul className="admin-submenu">
+                  <ul className="admin-submenu" aria-label="Admin Submenu">
                     <li><Link to="/admin">Admin Dashboard</Link></li>
                     <li><Link to="/admin/tenants">Tenant Management</Link></li>
                     <li><Link to="/admin/users">User Management</Link></li>
+                    <li><Link to="/admin/system-health">System Health</Link></li>
                   </ul>
                 )}
               </li>
             )}
-            <li><button onClick={logout}>Logout</button></li>
+            <li>
+              <button 
+                onClick={logout}
+                onKeyDown={(e) => handleKeyDown(e, logout)}
+              >
+                Logout
+              </button>
+            </li>
           </>
         ) : (
           <>

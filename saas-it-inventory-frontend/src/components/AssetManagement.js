@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-modal';
 import { getAssets, createAsset, updateAsset, deleteAsset } from '../services/api';
 import './AssetManagement.css';
+
+Modal.setAppElement('#root');
 
 const AssetManagement = () => {
   const [assets, setAssets] = useState([]);
   const [newAsset, setNewAsset] = useState({ name: '', type: '', serialNumber: '' });
   const [editingAsset, setEditingAsset] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState(null);
 
   useEffect(() => {
     fetchAssets();
@@ -13,10 +20,15 @@ const AssetManagement = () => {
 
   const fetchAssets = async () => {
     try {
+      setIsLoading(true);
       const data = await getAssets();
       setAssets(data);
+      setError('');
     } catch (error) {
+      setError('Error fetching assets. Please try again.');
       console.error('Error fetching assets:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -28,11 +40,15 @@ const AssetManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       await createAsset(newAsset);
       setNewAsset({ name: '', type: '', serialNumber: '' });
       fetchAssets();
     } catch (error) {
+      setError('Error creating asset. Please try again.');
       console.error('Error creating asset:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,86 +58,164 @@ const AssetManagement = () => {
 
   const handleUpdate = async () => {
     try {
+      setIsLoading(true);
       await updateAsset(editingAsset._id, editingAsset);
       setEditingAsset(null);
       fetchAssets();
     } catch (error) {
+      setError('Error updating asset. Please try again.');
       console.error('Error updating asset:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteAsset(id);
-      fetchAssets();
-    } catch (error) {
-      console.error('Error deleting asset:', error);
+  const openDeleteModal = (asset) => {
+    setAssetToDelete(asset);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setAssetToDelete(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDelete = async () => {
+    if (assetToDelete) {
+      try {
+        setIsLoading(true);
+        await deleteAsset(assetToDelete._id);
+        fetchAssets();
+      } catch (error) {
+        setError('Error deleting asset. Please try again.');
+        console.error('Error deleting asset:', error);
+      } finally {
+        setIsLoading(false);
+        closeDeleteModal();
+      }
     }
   };
+
+  const handleKeyDown = (e, action) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  };
+
+  if (isLoading) {
+    return <div className="loading" aria-live="polite">Loading assets...</div>;
+  }
 
   return (
     <div className="asset-management">
       <h2>Asset Management</h2>
-      <form onSubmit={handleSubmit}>
+      {error && <div className="error" role="alert">{error}</div>}
+      <form onSubmit={handleSubmit} className="asset-form">
+        <label htmlFor="name">Asset Name</label>
         <input
+          id="name"
           type="text"
           name="name"
           value={newAsset.name}
           onChange={handleInputChange}
-          placeholder="Asset Name"
           required
+          aria-required="true"
         />
+        <label htmlFor="type">Asset Type</label>
         <input
+          id="type"
           type="text"
           name="type"
           value={newAsset.type}
           onChange={handleInputChange}
-          placeholder="Asset Type"
           required
+          aria-required="true"
         />
+        <label htmlFor="serialNumber">Serial Number</label>
         <input
+          id="serialNumber"
           type="text"
           name="serialNumber"
           value={newAsset.serialNumber}
           onChange={handleInputChange}
-          placeholder="Serial Number"
           required
+          aria-required="true"
         />
-        <button type="submit">Add Asset</button>
+        <button type="submit" disabled={isLoading}>Add Asset</button>
       </form>
-      <ul className="asset-list">
+      <ul className="asset-list" aria-label="Asset list">
         {assets.map((asset) => (
-          <li key={asset._id}>
+          <li key={asset._id} className="asset-item">
             {editingAsset && editingAsset._id === asset._id ? (
-              <div>
+              <div className="asset-edit">
+                <label htmlFor={`edit-name-${asset._id}`}>Asset Name</label>
                 <input
+                  id={`edit-name-${asset._id}`}
                   type="text"
                   value={editingAsset.name}
                   onChange={(e) => setEditingAsset({ ...editingAsset, name: e.target.value })}
                 />
+                <label htmlFor={`edit-type-${asset._id}`}>Asset Type</label>
                 <input
+                  id={`edit-type-${asset._id}`}
                   type="text"
                   value={editingAsset.type}
                   onChange={(e) => setEditingAsset({ ...editingAsset, type: e.target.value })}
                 />
+                <label htmlFor={`edit-serialNumber-${asset._id}`}>Serial Number</label>
                 <input
+                  id={`edit-serialNumber-${asset._id}`}
                   type="text"
                   value={editingAsset.serialNumber}
                   onChange={(e) => setEditingAsset({ ...editingAsset, serialNumber: e.target.value })}
                 />
-                <button onClick={handleUpdate}>Save</button>
+                <button onClick={handleUpdate} disabled={isLoading}>Save</button>
                 <button onClick={() => setEditingAsset(null)}>Cancel</button>
               </div>
             ) : (
-              <div>
+              <div className="asset-info">
                 <span>{asset.name} - {asset.type} (SN: {asset.serialNumber})</span>
-                <button onClick={() => handleEdit(asset)}>Edit</button>
-                <button onClick={() => handleDelete(asset._id)}>Delete</button>
+                <div className="asset-actions">
+                  <button 
+                    onClick={() => handleEdit(asset)} 
+                    aria-label={`Edit ${asset.name}`}
+                    onKeyDown={(e) => handleKeyDown(e, () => handleEdit(asset))}
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => openDeleteModal(asset)} 
+                    aria-label={`Delete ${asset.name}`}
+                    onKeyDown={(e) => handleKeyDown(e, () => openDeleteModal(asset))}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             )}
           </li>
         ))}
       </ul>
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onRequestClose={closeDeleteModal}
+        contentLabel="Delete Asset Confirmation"
+        className="delete-modal"
+        overlayClassName="delete-modal-overlay"
+      >
+        <h2 id="delete-modal-title">Confirm Deletion</h2>
+        <p id="delete-modal-description">Are you sure you want to delete the asset: {assetToDelete?.name}?</p>
+        <div className="modal-actions">
+          <button 
+            onClick={handleDelete}
+            aria-describedby="delete-modal-description"
+          >
+            Yes, Delete
+          </button>
+          <button onClick={closeDeleteModal}>Cancel</button>
+        </div>
+      </Modal>
     </div>
   );
 };

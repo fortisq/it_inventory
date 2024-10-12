@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { login as apiLogin, register as apiRegister, getCurrentUser } from '../services/api';
+import { login as apiLogin, register as apiRegister, getCurrentUser, updateUserProfile } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -60,6 +60,18 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   };
 
+  const updateProfile = async (userData) => {
+    try {
+      const response = await updateUserProfile(userData);
+      setUser(response.data);
+      setSuccess('Profile updated successfully');
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message || 'An error occurred while updating the profile');
+      setSuccess(null);
+    }
+  };
+
   const clearError = () => {
     setError(null);
   };
@@ -86,6 +98,7 @@ export const AuthProvider = ({ children }) => {
       login, 
       register, 
       logout, 
+      updateProfile,
       isAuthenticated, 
       isAdmin,
       error, 

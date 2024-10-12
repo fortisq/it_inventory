@@ -48,4 +48,13 @@ export const createCheckoutSession = (plan) => api.post('/subscriptions/create-c
 export const getInvoiceHistory = () => api.get('/subscriptions/invoices');
 export const getPaymentMethods = () => api.get('/subscriptions/payment-methods');
 
+// System Health and User Profile
+export const getSystemHealth = () => api.get('/system/health');
+export const updateUserProfile = (userData) => api.put('/users/profile', userData);
+
+// Reports
+export const getReports = () => api.get('/reports');
+export const getReport = (id) => api.get(`/reports/${id}`);
+export const generateReport = (id) => api.post(`/reports/${id}/generate`);
+
 export default api;

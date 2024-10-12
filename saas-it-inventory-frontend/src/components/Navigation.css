@@ -9,10 +9,11 @@
   padding: 0;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .navigation li {
-  margin: 0 10px;
+  margin: 5px 10px;
   position: relative;
 }
 
@@ -26,11 +27,15 @@
   border: none;
   cursor: pointer;
   font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .navigation a:hover,
-.navigation button:hover {
+.navigation button:hover,
+.navigation a:focus,
+.navigation button:focus {
   background-color: #555;
+  outline: none;
 }
 
 .admin-menu {
@@ -49,7 +54,8 @@
 }
 
 .admin-menu:hover .admin-submenu,
-.admin-submenu:hover {
+.admin-submenu:hover,
+.admin-menu:focus-within .admin-submenu {
   display: block;
 }
 
@@ -65,6 +71,49 @@
   text-decoration: none;
 }
 
-.admin-submenu a:hover {
+.admin-submenu a:hover,
+.admin-submenu a:focus {
   background-color: #555;
+}
+
+@media screen and (max-width: 768px) {
+  .navigation ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navigation li {
+    margin: 5px 0;
+  }
+
+  .admin-submenu {
+    position: static;
+    display: none;
+    width: 100%;
+  }
+
+  .admin-menu:hover .admin-submenu,
+  .admin-submenu:hover,
+  .admin-menu:focus-within .admin-submenu {
+    display: block;
+  }
+}
+
+/* Accessibility improvements */
+.navigation a:focus,
+.navigation button:focus {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

@@ -1,0 +1,130 @@
+.reports {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.reports h2 {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--light-color);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.report-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.report-item {
+  background-color: white;
+  border: 1px solid var(--light-color);
+  border-radius: 8px;
+  padding: 20px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.report-item:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
+
+.report-item h3 {
+  color: var(--primary-color);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.report-item p {
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+}
+
+.view-report {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.view-report:hover {
+  background-color: #0056b3;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.loading {
+  text-align: center;
+  color: var(--secondary-color);
+  font-style: italic;
+  padding: 20px;
+}
+
+.error {
+  color: white;
+  background-color: var(--danger-color);
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.report-detail {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.report-detail h2 {
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+.report-detail p {
+  color: var(--secondary-color);
+  margin-bottom: 20px;
+}
+
+.report-detail button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .report-list {
+    grid-template-columns: 1fr;
+  }
+
+  .report-detail {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports {
+    padding: 10px;
+  }
+
+  .report-item {
+    padding: 15px;
+  }
+
+  .view-report {
+    display: block;
+    text-align: center;
+  }
+}
