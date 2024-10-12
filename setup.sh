@@ -27,6 +27,11 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Function to compare versions
+version_ge() {
+    test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"
+}
+
 # Check if running as root
 if [ "$(id -u)" = "0" ]; then
     error "This script should not be run as root. Please run as a normal user."
@@ -36,20 +41,23 @@ fi
 log "Updating and upgrading the system..."
 sudo apt-get update && sudo apt-get upgrade -y || error "Failed to update and upgrade the system"
 
-# Install Node.js 16.x and npm
-if ! command_exists node || ! command_exists npm; then
-    log "Installing Node.js 16.x and npm..."
-    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-    sudo apt-get install -y nodejs || error "Failed to install Node.js 16.x and npm"
-else
-    log "Node.js and npm are already installed. Checking versions..."
-    node_version=$(node --version)
+# Check Node.js version
+if command_exists node; then
+    node_version=$(node --version | cut -d 'v' -f 2)
     npm_version=$(npm --version)
     log "Node.js version: $node_version"
     log "npm version: $npm_version"
-    if [[ ! "$node_version" =~ ^v16\. ]]; then
-        error "Node.js version 16.x is required. Please update Node.js and run the script again."
+    if version_ge "$node_version" "16.0.0"; then
+        log "Node.js version is 16.x or higher. Proceeding with installation."
+    else
+        log "Node.js version is below 16.x. Attempting to install Node.js 16.x..."
+        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        sudo apt-get install -y nodejs || error "Failed to install Node.js 16.x"
     fi
+else
+    log "Node.js is not installed. Installing Node.js 16.x..."
+    curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+    sudo apt-get install -y nodejs || error "Failed to install Node.js 16.x"
 fi
 
 # Install Docker
