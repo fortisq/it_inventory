@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { getSubscription, createCheckoutSession, getInvoiceHistory, getPaymentMethods } from '../services/api';
@@ -13,11 +13,6 @@ const SubscriptionManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const location = useLocation();
-
-  useEffect(() => {
-    fetchData();
-    handleStripeRedirect();
-  }, []);
 
   const fetchData = async () => {
     try {
@@ -36,7 +31,7 @@ const SubscriptionManagement = () => {
     }
   };
 
-  const handleStripeRedirect = () => {
+  const handleStripeRedirect = useCallback(() => {
     const query = new URLSearchParams(location.search);
     if (query.get('success')) {
       setError(null);
@@ -44,7 +39,12 @@ const SubscriptionManagement = () => {
     } else if (query.get('canceled')) {
       setError('Subscription update was canceled.');
     }
-  };
+  }, [location.search]);
+
+  useEffect(() => {
+    fetchData();
+    handleStripeRedirect();
+  }, [handleStripeRedirect]);
 
   const handleUpgrade = async (newPlan) => {
     try {

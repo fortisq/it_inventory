@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 function Message({ type, children, onDismiss }) {
   const [visible, setVisible] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
+
+  const handleDismiss = useCallback(() => {
+    setFadeOut(true);
+    setTimeout(() => {
+      setVisible(false);
+      if (onDismiss) {
+        onDismiss();
+      }
+    }, 300);
+  }, [onDismiss]);
 
   useEffect(() => {
     setVisible(true);
@@ -11,17 +21,7 @@ function Message({ type, children, onDismiss }) {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [children]);
-
-  const handleDismiss = () => {
-    setFadeOut(true);
-    setTimeout(() => {
-      setVisible(false);
-      if (onDismiss) {
-        onDismiss();
-      }
-    }, 300);
-  };
+  }, [children, handleDismiss]);
 
   const getIcon = () => {
     return type === 'error' ? '❌' : '✅';

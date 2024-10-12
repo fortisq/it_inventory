@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getTenants, createTenant, updateTenant, deleteTenant, getTenantActivityLogs } from '../services/api';
 import './TenantManagement.css';
 
@@ -8,20 +8,20 @@ const TenantManagement = () => {
   const [editingTenant, setEditingTenant] = useState(null);
   const [activityLogs, setActivityLogs] = useState({});
 
-  useEffect(() => {
-    fetchTenants();
-  }, []);
-
-  const fetchTenants = async () => {
-    const fetchedTenants = await getTenants();
-    setTenants(fetchedTenants);
-    fetchedTenants.forEach(tenant => fetchTenantActivityLogs(tenant._id));
-  };
-
   const fetchTenantActivityLogs = async (tenantId) => {
     const logs = await getTenantActivityLogs(tenantId);
     setActivityLogs(prev => ({ ...prev, [tenantId]: logs }));
   };
+
+  const fetchTenants = useCallback(async () => {
+    const fetchedTenants = await getTenants();
+    setTenants(fetchedTenants);
+    fetchedTenants.forEach(tenant => fetchTenantActivityLogs(tenant._id));
+  }, []);
+
+  useEffect(() => {
+    fetchTenants();
+  }, [fetchTenants]);
 
   const handleCreateTenant = async (e) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserNotifications, getAdminNotifications } from '../services/api';
@@ -10,13 +10,7 @@ const Navigation = () => {
   const [userNotifications, setUserNotifications] = useState(0);
   const [adminNotifications, setAdminNotifications] = useState(0);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchNotifications();
-    }
-  }, [isAuthenticated]);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const userNotifs = await getUserNotifications();
       setUserNotifications(userNotifs.data.length);
@@ -28,7 +22,13 @@ const Navigation = () => {
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+    }
+  }, [isAuthenticated, fetchNotifications]);
 
   const toggleAdminMenu = () => {
     setShowAdminMenu(!showAdminMenu);
