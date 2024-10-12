@@ -1,3 +1,13 @@
+/**
+ * SaaS IT Inventory Application - Authentication Middleware
+ * 
+ * Copyright (c) 2024 Dan Bressers, NIT Solutions Ltd
+ * 
+ * This file is part of the SaaS IT Inventory Application.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 

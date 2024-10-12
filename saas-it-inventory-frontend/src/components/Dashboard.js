@@ -1,3 +1,13 @@
+/**
+ * SaaS IT Inventory Application - Dashboard Component
+ * 
+ * Copyright (c) 2024 Dan Bressers, NIT Solutions Ltd
+ * 
+ * This file is part of the SaaS IT Inventory Application.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
