@@ -12,6 +12,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Message from './Message';
+import './Dashboard.css';
 
 function Dashboard() {
   const { user, logout, success, clearMessages } = useAuth();
@@ -35,18 +36,26 @@ function Dashboard() {
   }, [success, navigate]);
 
   return (
-    <div>
+    <div className="dashboard">
       <h2>Dashboard</h2>
       {user && <p>Welcome, {user.firstName} {user.lastName}!</p>}
       <p>Welcome to your IT Inventory Dashboard!</p>
       <nav>
-        <ul>
+        <ul className="dashboard-menu">
           <li><Link to="/inventory">View Inventory</Link></li>
+          <li><Link to="/assets">Manage Assets</Link></li>
+          <li><Link to="/software-subscriptions">Software Subscriptions</Link></li>
+          <li><Link to="/reports">Reports and Analytics</Link></li>
+          {user.role === 'admin' && <li><Link to="/admin">Admin Panel</Link></li>}
+          <li><Link to="/system-health">System Health</Link></li>
         </ul>
       </nav>
-      <button onClick={handleLogout} disabled={isLoading}>
-        {isLoading ? 'Logging out...' : 'Logout'}
-      </button>
+      <div className="user-actions">
+        <Link to="/profile" className="profile-link">My Profile</Link>
+        <button onClick={handleLogout} disabled={isLoading} className="logout-button">
+          {isLoading ? 'Logging out...' : 'Logout'}
+        </button>
+      </div>
       {success && <Message type="success">{success}</Message>}
     </div>
   );
