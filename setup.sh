@@ -180,7 +180,7 @@ file_with_get_updates=$(grep -r "import.*getUpdates.*from '../services/api'" $fr
 
 if [ -n "$file_with_get_updates" ]; then
     log "Updating $file_with_get_updates"
-    sed -i "s/import.*getUpdates.*from '../services\/api'/import { getSystemUpdates as getUpdates } from '../services\/api'/" "$file_with_get_updates"
+    sed -i 's|import.*getUpdates.*from "../services/api"|import { getSystemUpdates as getUpdates } from "../services/api"|' "$file_with_get_updates"
 else
     log "No file found with getUpdates import. Skipping update."
 fi
