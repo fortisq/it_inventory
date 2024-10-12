@@ -194,6 +194,15 @@ If you encounter any issues during the installation or running of the applicatio
 6. Run the test script (`./test.sh`) to verify the installation and configuration.
 7. Check the System Health page in the admin dashboard for any issues with the application or its dependencies.
 
+## Documentation
+
+For more detailed information, please refer to the following documents:
+
+- [User Instructions](UserInstructions.md): Guide for end-users on how to use the application
+- [Admin Instructions](AdminInstructions.md): Guide for system administrators on how to manage the application
+- [Tenant Instructions](TenantInstructions.md): Guide for tenant administrators on how to manage their organization's account
+- [FAQ](FAQ.md): Frequently Asked Questions about the application
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
