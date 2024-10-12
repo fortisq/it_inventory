@@ -16,6 +16,7 @@ api.interceptors.request.use((config) => {
 
 export const login = (email, password) => api.post('/auth/login', { email, password });
 export const register = (userData) => api.post('/auth/register', userData);
+export const getCurrentUser = () => api.get('/auth/current-user');
 
 export const getAssets = () => api.get('/assets');
 export const createAsset = (assetData) => api.post('/assets', assetData);
