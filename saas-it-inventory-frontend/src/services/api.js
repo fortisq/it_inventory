@@ -69,6 +69,7 @@ export const getHelpRequest = (id) => api.get(`/help/requests/${id}`);
 export const createHelpRequest = (requestData) => api.post('/help/requests', requestData);
 export const updateHelpRequest = (id, requestData) => api.put(`/help/requests/${id}`, requestData);
 export const addCommentToHelpRequest = (id, commentData) => api.post(`/help/requests/${id}/comments`, commentData);
+export const submitHelpRequest = (requestData) => api.post('/help/requests', requestData);
 
 export const getSystemUpdates = () => api.get('/help/updates');
 
