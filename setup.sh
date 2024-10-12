@@ -82,6 +82,19 @@ sudo systemctl enable docker || error "Failed to enable Docker service"
 log "Adding current user to docker group..."
 sudo usermod -aG docker $USER || error "Failed to add user to docker group"
 
+log "You have been added to the docker group. Please log out and log back in for the changes to take effect."
+log "Alternatively, you can run the rest of the script with sudo."
+read -p "Do you want to continue with sudo? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    log "Continuing with sudo..."
+    SUDO="sudo -E"
+else
+    log "Please log out and log back in, then run this script again."
+    exit 0
+fi
+
 # Navigate to the project root directory
 cd "$(dirname "$0")" || error "Failed to navigate to the project directory"
 
@@ -118,30 +131,29 @@ cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to fronten
 
 # Install dependencies
 log "Installing dependencies..."
-npm ci || error "Failed to install dependencies"
+$SUDO npm ci || error "Failed to install dependencies"
 
 # Build and start the containers
 log "Building and starting Docker containers..."
-docker-compose up -d --build || error "Failed to build and start Docker containers"
+$SUDO docker-compose up -d --build || error "Failed to build and start Docker containers"
 
 log "Waiting for services to start..."
 sleep 10
 
 # Validate MongoDB connection
 log "Validating MongoDB connection..."
-if ! docker-compose exec -T backend node -e "const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected')).catch((err) => { console.error(err); process.exit(1); })"; then
+if ! $SUDO docker-compose exec -T backend node -e "const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected')).catch((err) => { console.error(err); process.exit(1); })"; then
     error "Failed to connect to MongoDB. Please check your MongoDB configuration."
 fi
 
-log "Setup complete. Please log out and log back in for the docker group changes to take effect."
-log "Your application should now be running. Access the frontend at http://localhost"
+log "Setup complete. Your application should now be running. Access the frontend at http://localhost"
 
 # Prompt to run database seeding script
 read -p "Do you want to seed the database with initial data? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    docker-compose exec backend npm run seed || error "Failed to seed the database"
+    $SUDO docker-compose exec backend npm run seed || error "Failed to seed the database"
 fi
 
 log "Setup and configuration complete. Your SaaS IT Inventory Application is ready to use!"

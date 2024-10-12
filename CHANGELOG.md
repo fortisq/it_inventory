@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added MongoDB connection validation after container startup
   - Replaced npm install with npm ci for more reliable dependency installation
   - Added automatic installation of Node.js and npm if not present on the system
+  - Added option to continue setup with sudo if user permissions are insufficient
 
 ### Changed
 - Updated Navigation component to include links to Reports section and Help & Support Portal
@@ -79,12 +80,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added more detailed progress information during installation
   - Automated MongoDB URI configuration, removing the need for user input
   - Added checks and installation for Node.js and npm dependencies
+  - Improved Docker permission handling by adding current user to docker group
+  - Added option to continue setup with sudo if user permissions are insufficient
 
 ### Fixed
 - Various bug fixes and performance improvements
 - Improved error handling in authentication middleware and tenant routes
 - Enhanced robustness and reliability of the installation process
 - Resolved issue with missing npm command in setup script by adding Node.js and npm installation
+- Addressed Docker permission issues in setup script by adding user to docker group and providing sudo option
 
 ## [1.0.0] - 2023-05-01
 
