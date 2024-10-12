@@ -4,6 +4,9 @@ FROM node:14.17.6-alpine AS build
 # Set working directory
 WORKDIR /app
 
+# Update npm to the latest version
+RUN npm install -g npm@latest
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
