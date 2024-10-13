@@ -28,9 +28,6 @@ RUN npm run build -- --verbose
 # Production stage
 FROM nginx:1.21-alpine
 
-# Install wget, curl, and netcat for healthcheck and debugging
-RUN apk add --no-cache wget curl netcat-openbsd
-
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
@@ -45,26 +42,11 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/
 RUN touch /var/run/nginx.pid && \
         chown -R nginx:nginx /var/run/nginx.pid
 
-# Create a script for health check
-RUN echo -e '#!/bin/sh\n\
-nginx_status=$(netstat -tuln | grep :80)\n\
-if [ -n "$nginx_status" ]; then\n\
-    echo "Nginx is running and listening on port 80"\n\
-    exit 0\n\
-else\n\
-    echo "Nginx is not running or not listening on port 80"\n\
-    exit 1\n\
-fi' > /healthcheck.sh && chmod +x /healthcheck.sh
-
 # Switch to non-root user
 USER nginx
 
 # Expose port 80
 EXPOSE 80
-
-# Add health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD /healthcheck.sh
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

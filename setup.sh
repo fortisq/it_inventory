@@ -85,22 +85,6 @@ check_docker_daemon() {
     fi
 }
 
-# Function to debug Docker issues
-debug_docker() {
-    log "Debugging Docker issues..."
-    docker version
-    docker info
-    docker network ls
-    docker volume ls
-}
-
-# Function to check container logs
-check_container_logs() {
-    local container=$1
-    log "Checking logs for $container container..."
-    docker-compose logs $container
-}
-
 # Main setup function
 main_setup() {
     # Check if running as root
@@ -188,88 +172,35 @@ main_setup() {
     retry 3 npm install || error "Failed to install frontend dependencies"
     cd ..
 
-    # Regenerate package-lock.json for backend
-    log "Regenerating package-lock.json for backend..."
-    cd saas-it-inventory || error "Failed to navigate to saas-it-inventory directory"
-    rm -f package-lock.json
-    retry 3 npm install || error "Failed to regenerate package-lock.json for backend"
+    # Install backend dependencies
+    log "Installing backend dependencies..."
+    cd saas-it-inventory || error "Failed to navigate to backend directory"
+    retry 3 npm install || error "Failed to install backend dependencies"
     cd ..
-
-    # Regenerate package-lock.json for frontend
-    log "Regenerating package-lock.json for frontend..."
-    cd saas-it-inventory-frontend || error "Failed to navigate to saas-it-inventory-frontend directory"
-    rm -f package-lock.json
-    retry 3 npm install || error "Failed to regenerate package-lock.json for frontend"
-    cd ..
-
-    # Verify package.json content for backend
-    log "Verifying backend package.json content..."
-    if [ ! -f saas-it-inventory/package.json ]; then
-        error "package.json not found in saas-it-inventory directory"
-    fi
-    cat saas-it-inventory/package.json || error "Failed to read backend package.json"
-
-    # Verify package.json content for frontend
-    log "Verifying frontend package.json content..."
-    if [ ! -f saas-it-inventory-frontend/package.json ]; then
-        error "package.json not found in saas-it-inventory-frontend directory"
-    fi
-    cat saas-it-inventory-frontend/package.json || error "Failed to read frontend package.json"
-
-    # Backup existing .env file
-    if [ -f .env ]; then
-        log "Backing up existing .env file..."
-        cp .env .env.backup.$(date +%Y%m%d%H%M%S)
-    fi
 
     # Create and configure .env file
     log "Configuring environment variables..."
-    rm -f .env
-    touch .env
-
-    # Configure MongoDB
-    log "Configuring MongoDB..."
-    echo "MONGODB_URI=mongodb://mongo:27017/it_inventory" >> .env
-    log "MongoDB URI configured automatically"
-
-    # Generate and save JWT Secret
-    JWT_SECRET=$(openssl rand -base64 32)
-    echo "JWT_SECRET=$JWT_SECRET" >> .env
-    log "JWT Secret generated and saved to .env"
-    log "WARNING: Storing secrets in .env files can be a security risk. Consider using a secret management solution in production."
-
-    # Generate and save Encryption Key for sensitive data
-    ENCRYPTION_KEY=$(openssl rand -base64 32)
-    echo "ENCRYPTION_KEY=$ENCRYPTION_KEY" >> .env
-    log "Encryption Key generated and saved to .env"
+    cat << EOF > .env
+MONGODB_URI=mongodb://mongo:27017/it_inventory
+JWT_SECRET=$(openssl rand -base64 32)
+ENCRYPTION_KEY=$(openssl rand -base64 32)
+EOF
+    log "Environment variables configured"
 
     # Copy .env to frontend directory
     log "Copying .env to frontend directory..."
     cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to frontend directory"
-
-    # Debug Docker setup
-    debug_docker
 
     # Build and start the containers
     log "Building and starting Docker containers..."
     retry 3 docker-compose up -d --build || error "Failed to build and start Docker containers"
 
     log "Waiting for services to start..."
-    sleep 60
+    sleep 30
 
     # Check container status
     log "Checking container status..."
     docker-compose ps
-
-    # Check container logs
-    log "Checking container logs..."
-    check_container_logs frontend
-    check_container_logs backend
-    check_container_logs mongo
-
-    # Validate MongoDB connection
-    log "Validating MongoDB connection..."
-    retry 3 docker-compose exec -T backend node -e "const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected')).catch((err) => { console.error(err); process.exit(1); })" || error "Failed to connect to MongoDB. Please check your MongoDB configuration."
 
     # Run the initialization script to create the super admin
     log "Creating super admin..."
