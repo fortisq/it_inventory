@@ -29,9 +29,11 @@ async function seedDatabase() {
       // Add more users as needed
     ];
 
+    const createdUsers = [];
     for (const user of users) {
       const newUser = new User(user);
       await newUser.save();
+      createdUsers.push(newUser);
     }
 
     // Seed inventory items
@@ -41,12 +43,14 @@ async function seedDatabase() {
         description: 'Dell XPS 13',
         quantity: 10,
         category: 'Electronics',
+        createdBy: createdUsers[0]._id, // Use the first created user as the creator
       },
       {
         name: 'Monitor',
         description: 'LG 27-inch 4K',
         quantity: 20,
         category: 'Electronics',
+        createdBy: createdUsers[0]._id,
       },
       // Add more inventory items as needed
     ];
