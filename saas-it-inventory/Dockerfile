@@ -19,6 +19,12 @@ FROM node:16-alpine
 # Set the working directory
 WORKDIR /usr/src/app
 
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install production dependencies
+RUN npm install --only=production
+
 # Copy built node modules and compiled code from the build stage
 COPY --from=builder /usr/src/app .
 
