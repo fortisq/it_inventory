@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Tenant = require('../models/Tenant');
 const User = require('../models/User');
-const authMiddleware = require('../middleware/authMiddleware');
+const { authMiddleware } = require('../middleware/authMiddleware');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const {
   sendSubscriptionChangeNotification,

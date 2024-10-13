@@ -8,11 +8,14 @@ function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, error, success, clearMessages } = useAuth();
+  const { login, error, success, clearError, clearSuccess } = useAuth();
 
   useEffect(() => {
-    return () => clearMessages();
-  }, [clearMessages]);
+    return () => {
+      clearError();
+      clearSuccess();
+    };
+  }, [clearError, clearSuccess]);
 
   const validateForm = () => {
     if (!email.trim()) {
@@ -31,7 +34,8 @@ function Login() {
     e.preventDefault();
     const validationError = validateForm();
     if (validationError) {
-      clearMessages();
+      clearError();
+      clearSuccess();
       return;
     }
 

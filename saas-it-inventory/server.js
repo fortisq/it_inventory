@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const tenantMiddleware = require('./middleware/tenantMiddleware');
-const errorHandler = require('./utils/errorHandler');
+const { errorHandler } = require('./utils/errorHandler');
 const { scheduleAllTasks } = require('./utils/scheduledTasks');
 
 dotenv.config();
@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(tenantMiddleware);
 
 // Routes
-const authRoutes = require('./routes/authRoutes');
+// const authRoutes = require('./routes/authRoutes');  // Commented out
 const userRoutes = require('./routes/userRoutes');
 const assetRoutes = require('./routes/assetRoutes');
 const licenseRoutes = require('./routes/licenseRoutes');
@@ -28,7 +28,7 @@ const healthRoutes = require('./routes/healthRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const helpRoutes = require('./routes/helpRoutes');
 
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);  // Commented out
 app.use('/api/users', userRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/licenses', licenseRoutes);

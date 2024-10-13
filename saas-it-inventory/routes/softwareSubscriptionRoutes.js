@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const SoftwareSubscription = require('../models/SoftwareSubscription');
-const authMiddleware = require('../middleware/authMiddleware');
+const { authMiddleware } = require('../middleware/authMiddleware');
 const { errorHandler } = require('../utils/errorHandler');
 
 // Get all software subscriptions
