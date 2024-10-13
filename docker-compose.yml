@@ -4,7 +4,7 @@ services:
   frontend:
     build: ./saas-it-inventory-frontend
     ports:
-      - "${FRONTEND_PORT:-80}:8080"
+      - "0.0.0.0:${FRONTEND_PORT:-80}:8080"
     depends_on:
       - backend
     restart: unless-stopped
@@ -17,7 +17,7 @@ services:
   backend:
     build: ./saas-it-inventory
     ports:
-      - "${BACKEND_PORT:-3000}:3000"
+      - "0.0.0.0:${BACKEND_PORT:-3000}:3000"
     environment:
       - NODE_ENV=production
       - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/it_inventory}
