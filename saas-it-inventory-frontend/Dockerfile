@@ -39,13 +39,23 @@ COPY --from=build /app/build /usr/share/nginx/html
 # Create necessary directories and set permissions
 RUN mkdir -p /var/log/nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx /var/cache/nginx /usr/share/nginx/html && \
-    chmod -R 755 /var/log/nginx /var/cache/nginx /usr/share/nginx/html
+    chmod -R 755 /var/log/nginx /var/cache/nginx /usr/share/nginx/html && \
+    touch /var/run/nginx.pid && \
+    chown nginx:nginx /var/run/nginx.pid
 
-# Switch to non-root user
+# Switch to root user temporarily
+USER root
+
+# Modify nginx.conf to use non-root user
+RUN sed -i 's/user  nginx;/user  nginx nginx;/' /etc/nginx/nginx.conf && \
+    sed -i 's/listen       80;/listen       8080;/' /etc/nginx/conf.d/default.conf && \
+    sed -i 's/listen  \[::\]:80;/listen  \[::\]:8080;/' /etc/nginx/conf.d/default.conf
+
+# Switch back to non-root user
 USER nginx
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8080
+EXPOSE 8080
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

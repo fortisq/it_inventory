@@ -4,17 +4,15 @@ services:
   frontend:
     build: ./saas-it-inventory-frontend
     ports:
-      - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_PORT:-80}:8080"
     depends_on:
       - backend
     restart: unless-stopped
     networks:
       - app-network
-    volumes:
-      - ./saas-it-inventory-frontend/nginx-logs:/var/log/nginx
     environment:
       - NODE_ENV=production
-      - REACT_APP_API_URL=http://backend:3000/api
+      - REACT_APP_API_URL=http://localhost:3000/api
 
   backend:
     build: ./saas-it-inventory
@@ -44,7 +42,6 @@ services:
 
 volumes:
   mongodb_data:
-  nginx-logs:
 
 networks:
   app-network:
