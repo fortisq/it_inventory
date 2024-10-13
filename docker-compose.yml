@@ -37,6 +37,9 @@ services:
       retries: 3
     networks:
       - app-network
+    command: >
+      sh -c "node scripts/init.js &&
+             npm start"
 
   mongo:
     image: mongo:4.4

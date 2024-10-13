@@ -49,8 +49,6 @@ if ! groups | grep -q docker; then
 EOF
 fi
 
-# The rest of the script continues here...
-
 # Update and upgrade the system
 log "Updating and upgrading the system..."
 sudo apt-get update && sudo apt-get upgrade -y || error "Failed to update and upgrade the system"
@@ -184,6 +182,10 @@ log "Validating MongoDB connection..."
 if ! docker-compose exec -T backend node -e "const mongoose = require('mongoose'); mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected')).catch((err) => { console.error(err); process.exit(1); })"; then
     error "Failed to connect to MongoDB. Please check your MongoDB configuration."
 fi
+
+# Run the initialization script to create the super admin
+log "Creating super admin..."
+docker-compose exec -T backend node scripts/init.js || error "Failed to create super admin"
 
 log "Setup complete. Your application should now be running. Access the frontend at http://localhost"
 
