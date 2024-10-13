@@ -163,15 +163,20 @@ exports.getAdminNotifications = async (req, res) => {
 
 exports.getUserNotifications = async (req, res) => {
   try {
+    console.log('getUserNotifications called');
+    console.log('Request headers:', req.headers);
     console.log('User object in getUserNotifications:', req.user);
     if (!req.user || !req.user._id) {
+      console.log('User not authenticated or user ID not found');
       return res.status(401).json({ message: 'User not authenticated or user ID not found' });
     }
+    console.log('Searching for help requests with createdBy:', req.user._id);
     const updatedRequests = await HelpRequest.find({ 
       createdBy: req.user._id, 
       userNotified: false,
       $or: [{ status: 'resolved' }, { status: 'closed' }]
     });
+    console.log('Found updated requests:', updatedRequests);
     res.json(updatedRequests);
   } catch (error) {
     console.error('Error in getUserNotifications:', error);

@@ -1,13 +1,3 @@
-/**
- * SaaS IT Inventory Application - Authentication Middleware
- * 
- * Copyright (c) 2024 Dan Bressers, NIT Solutions Ltd
- * 
- * This file is part of the SaaS IT Inventory Application.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const logger = require('../utils/logger');
@@ -22,29 +12,43 @@ class AuthError extends Error {
 
 const authMiddleware = async (req, res, next) => {
   try {
+    console.log('Auth middleware called');
+    console.log('Headers:', req.headers);
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
       throw new AuthError('No token provided', 401);
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    let user;
+    console.log('Token:', token);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      console.error('JWT verification error:', error);
+      throw new AuthError('Invalid token', 401);
+    }
+    console.log('Decoded token:', decoded);
 
+    let user;
     if (decoded.role === 'superadmin') {
       user = await User.findOne({ _id: decoded.userId, role: 'superadmin' });
     } else {
-      user = await User.findOne({ _id: decoded.userId, tenant: req.tenant?._id });
+      user = await User.findOne({ _id: decoded.userId });
+      if (user && req.tenant && user.tenant && user.tenant.toString() !== req.tenant._id.toString()) {
+        throw new AuthError('User does not belong to this tenant', 403);
+      }
     }
 
     if (!user) {
       throw new AuthError('User not found', 401);
     }
 
+    console.log('User found:', user);
     req.token = token;
     req.user = user;
     next();
   } catch (error) {
-    logger.error('Authentication error:', error);
+    console.error('Authentication error:', error);
     if (error instanceof AuthError) {
       res.status(error.statusCode).send({ error: error.message });
     } else {
@@ -79,7 +83,7 @@ const isTenantAdminOrSuperAdmin = async (req, res, next) => {
 
 const belongsToTenant = async (req, res, next) => {
   try {
-    if (req.user.role !== 'superadmin' && req.user.tenant.toString() !== req.params.tenantId) {
+    if (req.user.role !== 'superadmin' && req.user.tenant && req.user.tenant.toString() !== req.params.tenantId) {
       throw new AuthError('Access denied. User does not belong to this tenant.', 403);
     }
     next();

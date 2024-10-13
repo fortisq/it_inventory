@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { errorHandler } = require('../utils/errorHandler');
 
 exports.login = async (req, res) => {
@@ -14,8 +15,13 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
+    console.log("User found:", user);
+
     // Check password
-    const isMatch = await user.comparePassword(password);
+    const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+    const isMatch = hashedPassword === user.password;
+    console.log("Password match:", isMatch);
+
     if (!isMatch) {
       console.log("Password mismatch for user:", username);
       return res.status(401).json({ message: 'Invalid username or password' });
@@ -56,11 +62,14 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Username or email already exists' });
     }
 
+    // Hash password
+    const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+
     // Create new user
     const user = new User({
       username,
       email,
-      password,
+      password: hashedPassword,
       firstName,
       lastName,
       role: role || 'user'

@@ -86,6 +86,11 @@ export const AuthProvider = ({ children }) => {
     setSuccess(null);
   };
 
+  const clearMessages = () => {
+    clearError();
+    clearSuccess();
+  };
+
   const isAuthenticated = () => {
     console.log("Checking authentication, user:", user);
     return !!user;
@@ -113,7 +118,8 @@ export const AuthProvider = ({ children }) => {
       setError,
       setSuccess,
       clearError, 
-      clearSuccess 
+      clearSuccess,
+      clearMessages
     }}>
       {children}
     </AuthContext.Provider>

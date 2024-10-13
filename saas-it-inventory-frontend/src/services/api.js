@@ -71,7 +71,13 @@ export const getHelpRequests = () => api.get('/help/requests');
 export const createHelpRequest = (requestData) => api.post('/help/requests', requestData);
 export const updateHelpRequest = (id, requestData) => api.put(`/help/requests/${id}`, requestData);
 
-export const getUserNotifications = () => api.get('/notifications/user');
-export const getAdminNotifications = () => api.get('/notifications/admin');
+export const getUserNotifications = () => api.get('/help/notifications/user');
+export const getAdminNotifications = () => api.get('/help/notifications/admin');
+
+export const getInventory = () => api.get('/inventory');
+export const getInventoryItem = (id) => api.get(`/inventory/${id}`);
+export const createInventoryItem = (itemData) => api.post('/inventory', itemData);
+export const updateInventoryItem = (id, itemData) => api.put(`/inventory/${id}`, itemData);
+export const deleteInventoryItem = (id) => api.delete(`/inventory/${id}`);
 
 export default api;
