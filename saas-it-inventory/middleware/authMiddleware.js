@@ -28,7 +28,13 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: decoded.userId, tenant: req.tenant._id });
+    let user;
+
+    if (decoded.role === 'superadmin') {
+      user = await User.findOne({ _id: decoded.userId, role: 'superadmin' });
+    } else {
+      user = await User.findOne({ _id: decoded.userId, tenant: req.tenant?._id });
+    }
 
     if (!user) {
       throw new AuthError('User not found', 401);
@@ -49,7 +55,7 @@ const authMiddleware = async (req, res, next) => {
 
 const isAdmin = async (req, res, next) => {
   try {
-    if (req.user.role !== 'admin') {
+    if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
       throw new AuthError('Access denied. Admin privileges required.', 403);
     }
     next();
@@ -73,7 +79,7 @@ const isTenantAdminOrSuperAdmin = async (req, res, next) => {
 
 const belongsToTenant = async (req, res, next) => {
   try {
-    if (req.user.tenant.toString() !== req.params.tenantId) {
+    if (req.user.role !== 'superadmin' && req.user.tenant.toString() !== req.params.tenantId) {
       throw new AuthError('Access denied. User does not belong to this tenant.', 403);
     }
     next();

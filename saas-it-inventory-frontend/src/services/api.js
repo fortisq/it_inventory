@@ -14,9 +14,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const login = (email, password) => api.post('/auth/login', { email, password });
+export const login = async (username, password) => {
+  console.log("Sending login request to:", `${API_URL}/auth/login`);
+  try {
+    const response = await api.post('/auth/login', { username, password });
+    console.log("Login response:", response);
+    return response;
+  } catch (error) {
+    console.error("Login error:", error.response || error);
+    throw error;
+  }
+};
+
 export const register = (userData) => api.post('/auth/register', userData);
 export const getCurrentUser = () => api.get('/auth/current-user');
+export const updateUserProfile = (userData) => api.put('/auth/update-profile', userData);
 
 export const getAssets = () => api.get('/assets');
 export const createAsset = (assetData) => api.post('/assets', assetData);
@@ -32,62 +44,34 @@ export const getTenants = () => api.get('/tenants');
 export const createTenant = (tenantData) => api.post('/tenants', tenantData);
 export const updateTenant = (id, tenantData) => api.put(`/tenants/${id}`, tenantData);
 export const deleteTenant = (id) => api.delete(`/tenants/${id}`);
-export const getTenantActivityLogs = (tenantId) => api.get(`/tenants/${tenantId}/activity-logs`);
 
 export const getUsers = () => api.get('/users');
 export const createUser = (userData) => api.post('/users', userData);
 export const updateUser = (id, userData) => api.put(`/users/${id}`, userData);
 export const deleteUser = (id) => api.delete(`/users/${id}`);
 
-// Methods for AdminDashboard
-export const getTenantStats = () => api.get('/stats/tenants');
-export const getUserStats = () => api.get('/stats/users');
-export const getAssetStats = () => api.get('/stats/assets');
-
-// Methods for SubscriptionManagement
 export const getSubscription = () => api.get('/subscriptions');
 export const createCheckoutSession = (plan) => api.post('/subscriptions/create-checkout-session', { plan });
 export const getInvoiceHistory = () => api.get('/subscriptions/invoices');
 export const getPaymentMethods = () => api.get('/subscriptions/payment-methods');
 
-// Software Subscriptions
 export const getSoftwareSubscriptions = () => api.get('/software-subscriptions');
 export const createSoftwareSubscription = (subscriptionData) => api.post('/software-subscriptions', subscriptionData);
 export const updateSoftwareSubscription = (id, subscriptionData) => api.put(`/software-subscriptions/${id}`, subscriptionData);
 export const deleteSoftwareSubscription = (id) => api.delete(`/software-subscriptions/${id}`);
 
-// System Health and User Profile
-export const getSystemHealth = () => api.get('/system/health');
-export const updateUserProfile = (userData) => api.put('/users/profile', userData);
+export const getSystemHealth = () => api.get('/health');
 
-// Reports
 export const getReports = () => api.get('/reports');
 export const getReport = (id) => api.get(`/reports/${id}`);
 export const generateReport = (id) => api.post(`/reports/${id}/generate`);
 
-// Help and Support
 export const getHelpDocuments = () => api.get('/help/documents');
-export const getHelpDocument = (id) => api.get(`/help/documents/${id}`);
-export const createHelpDocument = (documentData) => api.post('/help/documents', documentData);
-export const updateHelpDocument = (id, documentData) => api.put(`/help/documents/${id}`, documentData);
-export const deleteHelpDocument = (id) => api.delete(`/help/documents/${id}`);
-
 export const getHelpRequests = () => api.get('/help/requests');
-export const getHelpRequest = (id) => api.get(`/help/requests/${id}`);
 export const createHelpRequest = (requestData) => api.post('/help/requests', requestData);
 export const updateHelpRequest = (id, requestData) => api.put(`/help/requests/${id}`, requestData);
-export const addCommentToHelpRequest = (id, commentData) => api.post(`/help/requests/${id}/comments`, commentData);
-export const submitHelpRequest = (requestData) => api.post('/help/requests', requestData);
 
-export const getSystemUpdates = () => api.get('/help/updates');
-
-// Notifications
-export const getAdminNotifications = () => api.get('/help/notifications/admin');
-export const getUserNotifications = () => api.get('/help/notifications/user');
-export const markAdminNotificationAsRead = (id) => api.put(`/help/notifications/admin/${id}`);
-export const markUserNotificationAsRead = (id) => api.put(`/help/notifications/user/${id}`);
-
-// Add this line to export getUpdates as an alias for getSystemUpdates
-export const getUpdates = getSystemUpdates;
+export const getUserNotifications = () => api.get('/notifications/user');
+export const getAdminNotifications = () => api.get('/notifications/admin');
 
 export default api;

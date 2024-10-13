@@ -14,7 +14,9 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
+          console.log("Fetching current user");
           const response = await getCurrentUser();
+          console.log("Current user data:", response.data);
           setUser(response.data);
         } catch (err) {
           console.error('Error fetching user data:', err);
@@ -27,22 +29,26 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (username, password) => {
     try {
-      const response = await apiLogin(email, password);
+      console.log("Attempting login in AuthContext");
+      const response = await apiLogin(username, password);
+      console.log("Login response:", response);
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
       setSuccess('Login successful');
       setError(null);
+      console.log("User set in state:", response.data.user);
     } catch (err) {
+      console.error("Login error in AuthContext:", err);
       setError(err.response?.data?.message || 'An error occurred during login');
       setSuccess(null);
     }
   };
 
-  const register = async (email, password, firstName, lastName) => {
+  const register = async (username, email, password, firstName, lastName) => {
     try {
-      const response = await apiRegister(email, password, firstName, lastName);
+      const response = await apiRegister(username, email, password, firstName, lastName);
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
       setSuccess('Registration successful');
@@ -81,11 +87,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAuthenticated = () => {
+    console.log("Checking authentication, user:", user);
     return !!user;
   };
 
   const isAdmin = () => {
-    return user && user.role === 'admin';
+    return user && (user.role === 'admin' || user.role === 'superadmin');
   };
 
   if (loading) {
