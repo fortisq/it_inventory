@@ -36,13 +36,10 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy the build output to replace the default nginx contents
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Set proper permissions
-RUN chown -R nginx:nginx /usr/share/nginx/html && chmod -R 755 /usr/share/nginx/html && \
-        chown -R nginx:nginx /var/cache/nginx && \
-        chown -R nginx:nginx /var/log/nginx && \
-        chown -R nginx:nginx /etc/nginx/conf.d
-RUN touch /var/run/nginx.pid && \
-        chown -R nginx:nginx /var/run/nginx.pid
+# Create necessary directories and set permissions
+RUN mkdir -p /var/log/nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx /var/cache/nginx /usr/share/nginx/html && \
+    chmod -R 755 /var/log/nginx /var/cache/nginx /usr/share/nginx/html
 
 # Switch to non-root user
 USER nginx
