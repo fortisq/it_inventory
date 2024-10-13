@@ -17,8 +17,10 @@ error_log() {
 
 # Cleanup function
 cleanup() {
-    log "Cleaning up..."
-    docker-compose down --remove-orphans
+    if [ "$?" -ne 0 ]; then
+        log "An error occurred. Cleaning up..."
+        docker-compose down --remove-orphans
+    fi
 }
 
 # Function to display error messages and exit
@@ -206,8 +208,6 @@ EOF
     log "Creating super admin..."
     retry 3 docker-compose exec -T backend node scripts/init.js || error "Failed to create super admin"
 
-    log "Setup complete. Your application should now be running. Access the frontend at http://localhost"
-
     # Prompt to run database seeding script
     read -p "Do you want to seed the database with initial data? (y/n) " -n 1 -r
     echo
@@ -216,7 +216,20 @@ EOF
         retry 3 docker-compose exec backend npm run seed || error "Failed to seed the database"
     fi
 
-    log "Setup and configuration complete. Your SaaS IT Inventory Application is ready to use!"
+    # Get the IP address
+    IP_ADDRESS=$(hostname -I | awk '{print $1}')
+
+    log "Setup and configuration complete. Your SaaS IT Inventory Application is now running!"
+    log "Access the application:"
+    log "- Local: http://localhost"
+    log "- Network: http://$IP_ADDRESS"
+    log "Login with the following credentials:"
+    log "- Username: root"
+    log "- Password: root"
+    log ""
+    log "To stop the application, run: docker-compose down"
+    log "To start the application again, run: docker-compose up -d"
+    log ""
     log "Please review the README.md file for additional configuration steps and usage instructions."
     log "Remember to configure payment and SMTP settings in the admin and tenant setup menus within the application."
 }
