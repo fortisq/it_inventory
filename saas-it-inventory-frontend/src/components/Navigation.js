@@ -1,29 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { getUserNotifications, getAdminNotifications } from '../services/api';
+import React, { useContext } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
-function Navigation() {
-  const { user, logout } = useAuth();
-  const [notifications, setNotifications] = useState([]);
+const Navigation = () => {
+  const { user, logout } = useContext(AuthContext);
+  const history = useHistory();
 
-  useEffect(() => {
-    fetchNotifications();
-  }, [user]);
-
-  const fetchNotifications = async () => {
-    if (user) {
-      try {
-        const response = user.role === 'admin' || user.role === 'superadmin'
-          ? await getAdminNotifications()
-          : await getUserNotifications();
-        setNotifications(response.data);
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-        setNotifications([]);
-      }
-    }
+  const handleLogout = () => {
+    logout();
+    history.push('/');
   };
+
+  if (!user) return null;
 
   return (
     <nav>
@@ -33,31 +21,14 @@ function Navigation() {
         <li><Link to="/assets">Assets</Link></li>
         <li><Link to="/software-subscriptions">Software Subscriptions</Link></li>
         <li><Link to="/reports">Reports</Link></li>
-        {user && (user.role === 'admin' || user.role === 'superadmin') && (
-          <li><Link to="/admin">Admin Panel</Link></li>
-        )}
+        <li><Link to="/data-visualization">Data Visualization</Link></li>
+        {user.role === 'admin' && <li><Link to="/user-management">User Management</Link></li>}
+        <li><Link to="/profile">Profile</Link></li>
         <li><Link to="/help-support">Help & Support</Link></li>
-        {user ? (
-          <>
-            <li><Link to="/profile">Profile</Link></li>
-            <li><button onClick={logout}>Logout</button></li>
-            <li>
-              Notifications: {notifications.length}
-              {notifications.length > 0 && (
-                <ul>
-                  {notifications.map((notification, index) => (
-                    <li key={index}>{notification.message}</li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          </>
-        ) : (
-          <li><Link to="/login">Login</Link></li>
-        )}
+        <li><button onClick={handleLogout}>Logout</button></li>
       </ul>
     </nav>
   );
-}
+};
 
 export default Navigation;

@@ -1,56 +1,52 @@
-const Report = require('../models/Report');
 const Asset = require('../models/Asset');
-const License = require('../models/License');
+const SoftwareSubscription = require('../models/SoftwareSubscription');
 
-exports.getAllReports = async (req, res) => {
+exports.getAssetReport = async (req, res) => {
   try {
-    const reports = await Report.find({ tenant: req.user.tenant });
-    res.json(reports);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching reports', error: error.message });
-  }
-};
+    const totalAssets = await Asset.countDocuments();
+    const assetsByStatus = await Asset.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    const assetsByType = await Asset.aggregate([
+      { $group: { _id: '$type', count: { $sum: 1 } } }
+    ]);
 
-exports.getReport = async (req, res) => {
-  try {
-    const report = await Report.findOne({ _id: req.params.id, tenant: req.user.tenant });
-    if (!report) {
-      return res.status(404).json({ message: 'Report not found' });
-    }
+    const report = {
+      totalAssets,
+      assetsByStatus: Object.fromEntries(assetsByStatus.map(item => [item._id, item.count])),
+      assetsByType: Object.fromEntries(assetsByType.map(item => [item._id, item.count]))
+    };
+
     res.json(report);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching report', error: error.message });
+    res.status(500).json({ message: 'Error generating asset report', error: error.message });
   }
 };
 
-exports.generateReport = async (req, res) => {
+exports.getSubscriptionReport = async (req, res) => {
   try {
-    const report = await Report.findOne({ _id: req.params.id, tenant: req.user.tenant });
-    if (!report) {
-      return res.status(404).json({ message: 'Report not found' });
-    }
-
-    let reportData;
-    switch (report.type) {
-      case 'asset':
-        reportData = await Asset.find({ tenant: req.user.tenant });
-        break;
-      case 'license':
-        reportData = await License.find({ tenant: req.user.tenant });
-        break;
-      // Add more cases for different report types
-      default:
-        return res.status(400).json({ message: 'Invalid report type' });
-    }
-
-    // Here you would typically process the data and generate a formatted report
-    // For this example, we're just sending back the raw data
-    res.json({
-      reportName: report.name,
-      generatedAt: new Date(),
-      data: reportData
+    const totalSubscriptions = await SoftwareSubscription.countDocuments();
+    const totalSeats = await SoftwareSubscription.aggregate([
+      { $group: { _id: null, total: { $sum: '$seats' } } }
+    ]);
+    const subscriptionsByVendor = await SoftwareSubscription.aggregate([
+      { $group: { _id: '$vendor', count: { $sum: 1 } } }
+    ]);
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+    const expiringSoon = await SoftwareSubscription.countDocuments({
+      expirationDate: { $lte: thirtyDaysFromNow, $gte: new Date() }
     });
+
+    const report = {
+      totalSubscriptions,
+      totalSeats: totalSeats[0]?.total || 0,
+      subscriptionsByVendor: Object.fromEntries(subscriptionsByVendor.map(item => [item._id, item.count])),
+      expiringSoon
+    };
+
+    res.json(report);
   } catch (error) {
-    res.status(500).json({ message: 'Error generating report', error: error.message });
+    res.status(500).json({ message: 'Error generating subscription report', error: error.message });
   }
 };

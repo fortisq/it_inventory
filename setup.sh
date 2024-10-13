@@ -182,16 +182,23 @@ main_setup() {
 
     # Create and configure .env file
     log "Configuring environment variables..."
+    JWT_SECRET=$(openssl rand -base64 32)
+    ENCRYPTION_KEY=$(openssl rand -base64 32)
     cat << EOF > .env
 MONGODB_URI=mongodb://mongo:27017/it_inventory
-JWT_SECRET=$(openssl rand -base64 32)
-ENCRYPTION_KEY=$(openssl rand -base64 32)
+JWT_SECRET=$JWT_SECRET
+ENCRYPTION_KEY=$ENCRYPTION_KEY
 EOF
     log "Environment variables configured"
 
     # Copy .env to frontend directory
     log "Copying .env to frontend directory..."
     cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to frontend directory"
+
+    # Update docker-compose.yml with environment variables
+    log "Updating docker-compose.yml with environment variables..."
+    sed -i "s/JWT_SECRET=.*/JWT_SECRET=\${JWT_SECRET}/" docker-compose.yml
+    sed -i "s/ENCRYPTION_KEY=.*/ENCRYPTION_KEY=\${ENCRYPTION_KEY}/" docker-compose.yml
 
     # Build and start the containers
     log "Building and starting Docker containers..."

@@ -1,32 +1,43 @@
 {
   "name": "saas-it-inventory-backend",
   "version": "1.0.0",
-  "description": "Backend for SaaS IT Inventory Application",
+  "description": "Backend for IT Inventory Management System",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "seed": "node scripts/seedData.js",
     "test": "jest",
-    "seed": "node scripts/seed.js"
+    "lint": "eslint .",
+    "health-check": "bash ../scripts/healthCheck.sh"
   },
-  "author": "Dan Bressers <dan@nitsolutions.ltd>",
-  "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
-    "mongoose": "^5.12.3",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^8.5.1",
-    "dotenv": "^8.2.0",
     "cors": "^2.8.5",
-    "nodemailer": "^6.5.0",
-    "stripe": "^8.142.0",
-    "winston": "^3.3.3"
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.7",
+    "morgan": "^1.10.0",
+    "helmet": "^4.6.0",
+    "express-rate-limit": "^5.3.0",
+    "joi": "^17.4.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7",
-    "jest": "^26.6.3"
+    "nodemon": "^2.0.12",
+    "jest": "^27.0.6",
+    "supertest": "^6.1.6",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.2"
   },
   "engines": {
-    "node": ">=16.0.0"
-  }
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-organization/it-inventory-management.git"
+  },
+  "author": "Your Name",
+  "license": "MIT"
 }

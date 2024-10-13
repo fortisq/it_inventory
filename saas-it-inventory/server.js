@@ -2,16 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/authRoutes');
-const assetRoutes = require('./routes/assetRoutes');
-const licenseRoutes = require('./routes/licenseRoutes');
-const subscriptionRoutes = require('./routes/subscriptionRoutes');
-const softwareSubscriptionRoutes = require('./routes/softwareSubscriptionRoutes');
-const healthRoutes = require('./routes/healthRoutes');
-const reportRoutes = require('./routes/reportRoutes');
-const helpRoutes = require('./routes/helpRoutes');
-const inventoryRoutes = require('./routes/inventoryRoutes');
-const { createSuperAdmin } = require('./utils/createSuperAdmin');
 
 dotenv.config();
 
@@ -25,38 +15,40 @@ app.use(express.json());
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false
 })
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('Error connecting to MongoDB:', err));
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Error connecting to MongoDB:', err));
 
 // Routes
+const authRoutes = require('./routes/authRoutes');
+const inventoryRoutes = require('./routes/inventoryRoutes');
+const assetRoutes = require('./routes/assetRoutes');
+const softwareSubscriptionRoutes = require('./routes/softwareSubscriptionRoutes');
+const userRoutes = require('./routes/userRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const healthRoutes = require('./routes/healthRoutes');
+
 app.use('/api/auth', authRoutes);
-app.use('/api/assets', assetRoutes);
-app.use('/api/licenses', licenseRoutes);
-app.use('/api/subscriptions', subscriptionRoutes);
-app.use('/api/software-subscriptions', softwareSubscriptionRoutes);
-app.use('/api/health', healthRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/help', helpRoutes);
 app.use('/api/inventory', inventoryRoutes);
-
-// Create super admin
-createSuperAdmin();
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.use('/api/assets', assetRoutes);
+app.use('/api/software-subscriptions', softwareSubscriptionRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/health', healthRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// 404 handler
-app.use((req, res, next) => {
-  res.status(404).send("Sorry, that route doesn't exist.");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;

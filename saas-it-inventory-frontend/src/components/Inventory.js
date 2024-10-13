@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getInventory, createInventoryItem, updateInventoryItem, deleteInventoryItem } from '../services/api';
+import api from '../services/api';
 
-function Inventory() {
-  const [inventory, setInventory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [newItem, setNewItem] = useState({ name: '', quantity: 0, category: '' });
+const Inventory = () => {
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [newItem, setNewItem] = useState({ name: '', description: '', quantity: 0 });
 
   useEffect(() => {
     fetchInventory();
@@ -13,101 +11,66 @@ function Inventory() {
 
   const fetchInventory = async () => {
     try {
-      setLoading(true);
-      const response = await getInventory();
-      setInventory(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch inventory. Please try again later.');
-      setLoading(false);
+      const response = await api.get('/api/inventory');
+      setInventoryItems(response.data);
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
     }
   };
 
-  const handleAddItem = async (e) => {
+  const handleInputChange = (e) => {
+    setNewItem({ ...newItem, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createInventoryItem(newItem);
-      setNewItem({ name: '', quantity: 0, category: '' });
-      await fetchInventory();
-    } catch (err) {
-      setError('Failed to add item. Please try again.');
+      await api.post('/api/inventory', newItem);
+      setNewItem({ name: '', description: '', quantity: 0 });
+      fetchInventory();
+    } catch (error) {
+      console.error('Error adding inventory item:', error);
     }
   };
-
-  const handleUpdateItem = async (id, updatedItem) => {
-    try {
-      await updateInventoryItem(id, updatedItem);
-      await fetchInventory();
-    } catch (err) {
-      setError('Failed to update item. Please try again.');
-    }
-  };
-
-  const handleDeleteItem = async (id) => {
-    try {
-      await deleteInventoryItem(id);
-      await fetchInventory();
-    } catch (err) {
-      setError('Failed to delete item. Please try again.');
-    }
-  };
-
-  if (loading) return <div>Loading inventory...</div>;
-  if (error) return <div>{error}</div>;
 
   return (
     <div>
       <h2>Inventory</h2>
-      <form onSubmit={handleAddItem}>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="Item name"
+          name="name"
           value={newItem.name}
-          onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+          onChange={handleInputChange}
+          placeholder="Item Name"
           required
+        />
+        <input
+          type="text"
+          name="description"
+          value={newItem.description}
+          onChange={handleInputChange}
+          placeholder="Description"
         />
         <input
           type="number"
-          placeholder="Quantity"
+          name="quantity"
           value={newItem.quantity}
-          onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Category"
-          value={newItem.category}
-          onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+          onChange={handleInputChange}
+          placeholder="Quantity"
           required
         />
         <button type="submit">Add Item</button>
       </form>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Quantity</th>
-            <th>Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {inventory.map((item) => (
-            <tr key={item._id}>
-              <td>{item.name}</td>
-              <td>{item.quantity}</td>
-              <td>{item.category}</td>
-              <td>
-                <button onClick={() => handleUpdateItem(item._id, { ...item, quantity: item.quantity + 1 })}>+</button>
-                <button onClick={() => handleUpdateItem(item._id, { ...item, quantity: Math.max(0, item.quantity - 1) })}>-</button>
-                <button onClick={() => handleDeleteItem(item._id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ul>
+        {inventoryItems.map((item) => (
+          <li key={item._id}>
+            {item.name} - {item.description} (Quantity: {item.quantity})
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
 
 export default Inventory;
