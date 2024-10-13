@@ -87,12 +87,38 @@ check_docker_daemon() {
     fi
 }
 
+# Function to check and wait for MongoDB connection
+check_mongodb_connection() {
+    log "Checking MongoDB connection..."
+    retry 5 docker-compose exec -T mongo mongo --eval "db.stats()" > /dev/null 2>&1 || error "Failed to connect to MongoDB"
+    log "MongoDB connection successful"
+}
+
+# Function to check backend health
+check_backend_health() {
+    log "Checking backend health..."
+    retry 5 curl -f http://localhost:3000/health || error "Backend health check failed"
+    log "Backend health check passed"
+}
+
+# Function to check for available disk space
+check_disk_space() {
+    local required_space=5  # in GB
+    local available_space=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
+    if [ "$available_space" -lt "$required_space" ]; then
+        error "Not enough disk space. At least ${required_space}GB is required, but only ${available_space}GB is available."
+    fi
+}
+
 # Main setup function
 main_setup() {
     # Check if running as root
     if [ "$(id -u)" = "0" ]; then
         error "This script should not be run as root. Please run as a normal user."
     fi
+
+    # Check disk space
+    check_disk_space
 
     # Install system dependencies
     install_system_dependencies
@@ -119,10 +145,10 @@ main_setup() {
         npm_version=$(npm --version)
         log "Node.js version: $node_version"
         log "npm version: $npm_version"
-        if version_ge "$node_version" "16.0.0"; then
-            log "Node.js version is 16.x or higher. Proceeding with installation."
+        if version_ge "$node_version" "16.0.0" && version_ge "$npm_version" "7.0.0"; then
+            log "Node.js and npm versions are compatible. Proceeding with installation."
         else
-            log "Node.js version is below 16.x. Attempting to install Node.js 16.x..."
+            log "Node.js or npm version is below required. Attempting to install Node.js 16.x..."
             curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
             sudo apt-get install -y nodejs || error "Failed to install Node.js 16.x"
         fi
@@ -188,6 +214,8 @@ main_setup() {
 MONGODB_URI=mongodb://mongo:27017/it_inventory
 JWT_SECRET=$JWT_SECRET
 ENCRYPTION_KEY=$ENCRYPTION_KEY
+NODE_ENV=production
+PORT=3000
 EOF
     log "Environment variables configured"
 
@@ -210,6 +238,12 @@ EOF
     # Check container status
     log "Checking container status..."
     docker-compose ps
+
+    # Check MongoDB connection
+    check_mongodb_connection
+
+    # Check backend health
+    check_backend_health
 
     # Run the initialization script to create the super admin
     log "Creating super admin..."

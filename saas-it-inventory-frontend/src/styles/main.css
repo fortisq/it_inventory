@@ -11,25 +11,6 @@ body {
   padding: 20px;
 }
 
-nav {
-  background-color: #333;
-  color: white;
-  padding: 10px 0;
-}
-
-nav ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: space-around;
-}
-
-nav ul li a {
-  color: white;
-  text-decoration: none;
-}
-
 h1, h2, h3 {
   color: #333;
 }
@@ -92,27 +73,109 @@ tr:nth-child(even) {
   margin-top: 20px;
 }
 
-.dashboard-stats {
+/* Navigation styles */
+.navigation {
+  background-color: #333;
+  padding: 10px;
+}
+
+.nav-menu {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  justify-content: space-around;
+  align-items: center;
 }
 
-.stat-card {
+.nav-menu li a {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.nav-menu li a svg {
+  margin-right: 5px;
+}
+
+.nav-menu li a.active {
+  background-color: #555;
+  border-radius: 5px;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropbtn {
+  background-color: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  height: 2px;
+  width: 25px;
   background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  width: 30%;
-  text-align: center;
+  margin-bottom: 4px;
 }
 
-.stat-card h3 {
-  margin-top: 0;
-}
+@media screen and (max-width: 768px) {
+  .nav-toggle {
+    display: flex;
+  }
 
-.stat-card p {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 0;
+  .nav-menu {
+    display: none;
+    flex-direction: column;
+  }
+
+  .nav-menu.open {
+    display: flex;
+  }
+
+  .dropdown-content {
+    position: static;
+    display: none;
+    background-color: #444;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: none;
+  }
+
+  .dropdown.open .dropdown-content {
+    display: block;
+  }
 }
