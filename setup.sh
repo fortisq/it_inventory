@@ -85,6 +85,22 @@ check_docker_daemon() {
     fi
 }
 
+# Function to debug Docker issues
+debug_docker() {
+    log "Debugging Docker issues..."
+    docker version
+    docker info
+    docker network ls
+    docker volume ls
+}
+
+# Function to check container logs
+check_container_logs() {
+    local container=$1
+    log "Checking logs for $container container..."
+    docker-compose logs $container
+}
+
 # Main setup function
 main_setup() {
     # Check if running as root
@@ -231,6 +247,9 @@ main_setup() {
     log "Copying .env to frontend directory..."
     cp .env saas-it-inventory-frontend/.env || error "Failed to copy .env to frontend directory"
 
+    # Debug Docker setup
+    debug_docker
+
     # Build and start the containers
     log "Building and starting Docker containers..."
     retry 3 docker-compose up -d --build || error "Failed to build and start Docker containers"
@@ -244,7 +263,9 @@ main_setup() {
 
     # Check container logs
     log "Checking container logs..."
-    docker-compose logs
+    check_container_logs frontend
+    check_container_logs backend
+    check_container_logs mongo
 
     # Validate MongoDB connection
     log "Validating MongoDB connection..."

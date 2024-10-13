@@ -10,8 +10,8 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
-      interval: 60s
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
       timeout: 10s
       retries: 5
       start_period: 40s
@@ -19,6 +19,13 @@ services:
       - app-network
     volumes:
       - ./saas-it-inventory-frontend/nginx-logs:/var/log/nginx
+    environment:
+      - NODE_ENV=production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   backend:
     build: ./saas-it-inventory
@@ -43,6 +50,11 @@ services:
     command: >
       sh -c "node scripts/init.js &&
              npm start"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   mongo:
     image: mongo:4.4
@@ -56,6 +68,11 @@ services:
       retries: 3
     networks:
       - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
 volumes:
   mongodb_data:

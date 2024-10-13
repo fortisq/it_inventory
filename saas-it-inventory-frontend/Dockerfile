@@ -28,8 +28,8 @@ RUN npm run build -- --verbose
 # Production stage
 FROM nginx:1.21-alpine
 
-# Install wget for healthcheck
-RUN apk add --no-cache wget
+# Install wget and curl for healthcheck and debugging
+RUN apk add --no-cache wget curl
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -52,8 +52,8 @@ USER nginx
 EXPOSE 80
 
 # Add health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:80 || exit 1
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
