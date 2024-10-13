@@ -23,6 +23,8 @@ RUN npm install @types/node
 COPY . .
 
 # Build the application with verbose output
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
 RUN npm run build -- --verbose
 
 # Production stage
