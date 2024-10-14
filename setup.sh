@@ -85,7 +85,7 @@ ensure_directories() {
 install_system_dependencies() {
     log "Checking and installing system dependencies..."
     sudo apt-get update
-    sudo apt-get install -y curl wget git build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    sudo apt-get install -y curl wget git build-essential
 }
 
 # Function to check Docker daemon status
@@ -178,24 +178,16 @@ main_setup() {
     log "Updating and upgrading the system..."
     sudo apt-get update && sudo apt-get upgrade -y || error "Failed to update and upgrade the system"
 
-    # Check Node.js version
-    if command_exists node; then
-        node_version=$(node --version | cut -d 'v' -f 2)
-        npm_version=$(npm --version)
-        log "Node.js version: $node_version"
-        log "npm version: $npm_version"
-        if version_ge "$node_version" "18.0.0"; then
-            log "Node.js version is 18.x or higher. Proceeding with installation."
-        else
-            log "Node.js version is below 18.x. Attempting to install Node.js 18.x..."
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y nodejs || error "Failed to install Node.js 18.x"
-        fi
-    else
-        log "Node.js is not installed. Installing Node.js 18.x..."
-        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-        sudo apt-get install -y nodejs || error "Failed to install Node.js 18.x"
-    fi
+    # Install Node.js 18.x
+    log "Installing Node.js 18.x..."
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    sudo apt-get install -y nodejs || error "Failed to install Node.js 18.x"
+
+    # Verify Node.js and npm versions
+    node_version=$(node --version)
+    npm_version=$(npm --version)
+    log "Node.js version: $node_version"
+    log "npm version: $npm_version"
 
     # Install Docker
     if ! command_exists docker; then
