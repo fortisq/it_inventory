@@ -6,18 +6,19 @@
 3. [System Requirements](#system-requirements)
 4. [Prerequisites](#prerequisites)
 5. [Installation and Setup](#installation-and-setup)
-6. [Usage](#usage)
-7. [Development](#development)
-8. [Stopping and Restarting the Application](#stopping-and-restarting-the-application)
-9. [Troubleshooting](#troubleshooting)
-10. [Security Considerations](#security-considerations)
-11. [Backups and Data Management](#backups-and-data-management)
-12. [Customization and Extending the Application](#customization-and-extending-the-application)
-13. [Contributing](#contributing)
-14. [License](#license)
-15. [Support](#support)
-16. [Additional Information](#additional-information)
-17. [Recent Updates](#recent-updates)
+6. [Updating the Application](#updating-the-application)
+7. [Usage](#usage)
+8. [Development](#development)
+9. [Stopping and Restarting the Application](#stopping-and-restarting-the-application)
+10. [Troubleshooting](#troubleshooting)
+11. [Security Considerations](#security-considerations)
+12. [Backups and Data Management](#backups-and-data-management)
+13. [Customization and Extending the Application](#customization-and-extending-the-application)
+14. [Contributing](#contributing)
+15. [License](#license)
+16. [Support](#support)
+17. [Additional Information](#additional-information)
+18. [Recent Updates](#recent-updates)
 
 ## Overview
 
@@ -87,6 +88,28 @@ IT Inventory is a comprehensive solution designed to help organizations efficien
 Note: The setup script automatically generates secure values for JWT_SECRET and ENCRYPTION_KEY environment variables. These are used in the docker-compose.yml file for enhanced security.
 
 If the setup process is interrupted or fails, you can safely run the script again. It includes cleanup procedures to ensure a fresh start.
+
+## Updating the Application
+
+The application now includes an automatic update mechanism to keep your installation up-to-date with the latest changes from the GitHub repository. Here's how it works:
+
+1. Automatic updates:
+   Every time you run the `setup.sh` script, it will automatically check for updates before proceeding with the setup process. This ensures that your installation is always using the latest version of the application.
+
+2. Manual updates:
+   You can manually check for updates at any time by running:
+   ```
+   ./update.sh
+   ```
+   This script will:
+   - Fetch the latest changes from the GitHub repository
+   - Update the local files
+   - Restart the services if necessary
+
+Important notes:
+- Before running an update, make sure to commit and push any local changes you want to keep, as the update process may overwrite local modifications.
+- The update process will update both the backend and frontend code, as well as any configuration files or scripts.
+- If you encounter any issues after an update, you can refer to the [Troubleshooting](#troubleshooting) section or contact support.
 
 ## Usage
 
@@ -187,6 +210,8 @@ The setup process has been updated to include additional dependencies for genera
 
 2. Updated the test_setup.ps1 script to verify the presence of these new dependencies.
 
+3. Implemented an automatic update mechanism to keep the application up-to-date with the latest changes from the GitHub repository.
+
 ### Testing the Updated Setup
 
 To test the updated setup process:
@@ -205,4 +230,9 @@ To test the updated setup process:
 
 4. Access the application and test the functionality related to generating reports, charts, and exporting data to ensure the new dependencies are working correctly.
 
-If you encounter any issues during the setup or testing process, please refer to the troubleshooting section in this README or contact the development team for assistance.
+5. Test the update mechanism by running:
+   ```
+   ./update.sh
+   ```
+
+If you encounter any issues during the setup, testing, or update process, please refer to the troubleshooting section in this README or contact the development team for assistance.

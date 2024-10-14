@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const Tenant = require('../models/Tenant');
-const { authMiddleware, isAdmin, isTenantAdminOrSuperAdmin, belongsToTenant } = require('../middleware/authMiddleware');
+const { authMiddleware, isSuperAdmin, isTenantAdminOrSuperAdmin, belongsToTenant } = require('../middleware/authMiddleware');
 const logger = require('../utils/logger');
 
 // Input validation middleware
@@ -22,7 +22,7 @@ const validate = (validations) => {
 // Create a new tenant
 router.post('/', 
   authMiddleware, 
-  isAdmin, 
+  isSuperAdmin, 
   validate([
     body('name').notEmpty().withMessage('Name is required'),
     body('subdomain').notEmpty().withMessage('Subdomain is required')
@@ -40,7 +40,7 @@ router.post('/',
 );
 
 // Get all tenants with pagination
-router.get('/', authMiddleware, isAdmin, async (req, res) => {
+router.get('/', authMiddleware, isSuperAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -62,7 +62,7 @@ router.get('/', authMiddleware, isAdmin, async (req, res) => {
 });
 
 // Get a specific tenant
-router.get('/:id', authMiddleware, isAdmin, async (req, res) => {
+router.get('/:id', authMiddleware, isSuperAdmin, async (req, res) => {
   try {
     const tenant = await Tenant.findById(req.params.id);
     if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
@@ -76,7 +76,7 @@ router.get('/:id', authMiddleware, isAdmin, async (req, res) => {
 // Update a tenant
 router.put('/:id', 
   authMiddleware, 
-  isAdmin, 
+  isSuperAdmin, 
   belongsToTenant,
   validate([
     body('name').optional().notEmpty().withMessage('Name cannot be empty'),
@@ -95,7 +95,7 @@ router.put('/:id',
 );
 
 // Delete a tenant
-router.delete('/:id', authMiddleware, isAdmin, async (req, res) => {
+router.delete('/:id', authMiddleware, isSuperAdmin, async (req, res) => {
   try {
     const tenant = await Tenant.findByIdAndDelete(req.params.id);
     if (!tenant) return res.status(404).json({ message: 'Tenant not found' });
@@ -140,10 +140,10 @@ router.put('/:id/smtp',
   }
 );
 
-// Update Stripe settings (admin only)
+// Update Stripe settings (superadmin only)
 router.put('/:id/stripe', 
   authMiddleware, 
-  isAdmin,
+  isSuperAdmin,
   validate([
     body('stripeSettings.publishableKey').notEmpty().withMessage('Stripe publishable key is required'),
     body('stripeSettings.secretKey').notEmpty().withMessage('Stripe secret key is required'),

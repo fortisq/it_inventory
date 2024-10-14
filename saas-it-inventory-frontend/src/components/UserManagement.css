@@ -2,11 +2,13 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  font-family: Arial, sans-serif;
 }
 
 .user-management h2 {
   margin-bottom: 20px;
   color: #333;
+  font-size: 24px;
 }
 
 .error, .success {
@@ -25,60 +27,31 @@
   color: #2e7d32;
 }
 
-.menu-toggle {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
 .user-management-content {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.user-management-content.open {
-  display: flex;
-}
-
 .user-form {
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
   padding: 20px;
   border-radius: 8px;
-}
-
-.user-form h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.user-form label {
-  display: block;
-  margin-bottom: 5px;
-  color: #666;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .user-form input,
 .user-form select {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin-bottom: 15px;
-  border: 1px solid #ddd;
+  border: 1px solid #ced4da;
   border-radius: 4px;
   font-size: 16px;
 }
 
 .user-form button {
-  background-color: #4CAF50;
+  background-color: #28a745;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -89,6 +62,11 @@
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.user-form button:hover {
+  background-color: #218838;
 }
 
 .user-form button:disabled {
@@ -104,83 +82,83 @@
 }
 
 .user-list h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   color: #333;
 }
 
-.user-list ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.user-item {
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  padding: 15px;
+.search-input {
+  width: 100%;
+  padding: 10px;
   margin-bottom: 15px;
-}
-
-.user-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.user-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.user-actions button {
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  margin: 4px 2px;
-  cursor: pointer;
+  border: 1px solid #ced4da;
   border-radius: 4px;
+  font-size: 16px;
 }
 
-.user-actions button:last-child {
-  background-color: #f44336;
-}
-
-.user-edit {
+.user-list table {
+  width: 100%;
+  border-collapse: collapse;
   margin-top: 15px;
 }
 
-.user-edit input,
-.user-edit select {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+.user-list th,
+.user-list td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.user-edit button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  margin: 4px 2px;
+.user-list th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #495057;
   cursor: pointer;
-  border-radius: 4px;
 }
 
-.user-edit button:last-child {
-  background-color: #f44336;
+.user-list th:hover {
+  background-color: #e9ecef;
+}
+
+.user-list tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.user-list tr:hover {
+  background-color: #e9ecef;
+}
+
+.edit-button, .delete-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.edit-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+.edit-button:disabled, .delete-button:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
 }
 
 .loading {
@@ -196,7 +174,7 @@
   height: 20px;
   border: 3px solid rgba(0,0,0,.3);
   border-radius: 50%;
-  border-top-color: #fff;
+  border-top-color: #007bff;
   animation: spin 1s ease-in-out infinite;
   margin-right: 10px;
 }
@@ -205,7 +183,7 @@
   to { transform: rotate(360deg); }
 }
 
-.delete-modal {
+.delete-modal, .edit-modal, .confirm-update-modal {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -215,9 +193,10 @@
   border-radius: 8px;
   max-width: 400px;
   width: 100%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.delete-modal-overlay {
+.delete-modal-overlay, .edit-modal-overlay, .confirm-update-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -226,7 +205,7 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.delete-modal h2 {
+.delete-modal h2, .edit-modal h2, .confirm-update-modal h2 {
   margin-top: 0;
   color: #333;
 }
@@ -239,11 +218,78 @@
 
 .modal-actions button {
   margin-left: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.modal-actions button:first-child {
+  background-color: #dc3545;
+  color: white;
+}
+
+.modal-actions button:first-child:hover {
+  background-color: #c82333;
+}
+
+.modal-actions button:last-child {
+  background-color: #6c757d;
+  color: white;
+}
+
+.modal-actions button:last-child:hover {
+  background-color: #5a6268;
 }
 
 .access-denied {
   text-align: center;
   padding: 50px;
   font-size: 24px;
-  color: #f44336;
+  color: #dc3545;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border: 1px solid #007bff;
+  background-color: #fff;
+  color: #007bff;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination button:hover,
+.pagination button.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.change-password-section {
+  margin-bottom: 15px;
+}
+
+.change-password-section label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.change-password-section input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.note {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+  font-style: italic;
 }

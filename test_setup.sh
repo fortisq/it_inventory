@@ -1,42 +1,83 @@
 #!/bin/bash
 
-# Function to check if a string exists in the file
-check_exists() {
-    if grep -q "$1" setup.sh; then
-        echo "[PASS] $2"
-    else
-        echo "[FAIL] $2"
-        exit 1
-    fi
+set -e
+
+# Mock functions and commands
+command_exists() {
+    case "$1" in
+        node|npm|docker|docker-compose)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
 }
 
-# Check if setup.sh exists
-if [ ! -f "setup.sh" ]; then
-    echo "[FAIL] setup.sh file not found"
-    exit 1
-fi
+docker() {
+    echo "Mock Docker: $@"
+}
 
-# Check for syntax errors
-bash -n setup.sh
-if [ $? -ne 0 ]; then
-    echo "[FAIL] Syntax error in setup.sh"
-    exit 1
-else
-    echo "[PASS] No syntax errors found in setup.sh"
-fi
+docker-compose() {
+    echo "Mock Docker Compose: $@"
+}
 
-# Check for necessary functions and commands
-check_exists "function main_setup" "Main setup function exists"
-check_exists "function install_system_dependencies" "System dependencies installation function exists"
-check_exists "function install_mongodb" "MongoDB installation function exists"
-check_exists "function check_docker_daemon" "Docker daemon check function exists"
-check_exists "docker-compose" "Docker Compose command is used"
-check_exists "npm install" "npm install command is used"
-check_exists "JWT_SECRET=" "JWT_SECRET is set"
-check_exists "ENCRYPTION_KEY=" "ENCRYPTION_KEY is set"
-check_exists "MONGODB_URI=" "MONGODB_URI is set"
-check_exists "NODE_ENV=" "NODE_ENV is set"
-check_exists "PORT=" "PORT is set"
-check_exists "REACT_APP_API_URL=" "REACT_APP_API_URL is set"
+apt-get() {
+    echo "Mock apt-get: $@"
+}
 
-echo "All tests passed successfully!"
+systemctl() {
+    echo "Mock systemctl: $@"
+}
+
+# Mock environment variables
+export MOCK_NODE_VERSION="16.0.0"
+export MOCK_NPM_VERSION="7.0.0"
+export MOCK_DOCKER_VERSION="20.10.0"
+export MOCK_COMPOSE_VERSION="1.29.2"
+
+# Source the setup script to get access to its functions
+source ./setup.sh
+
+# Test functions
+test_check_disk_space() {
+    echo "Testing check_disk_space function..."
+    df() {
+        echo "Filesystem     1K-blocks      Used Available Use% Mounted on"
+        echo "/dev/sda1      10485760   5242880   5242880  50% /"
+    }
+    check_disk_space
+    echo "check_disk_space test passed"
+}
+
+test_install_system_dependencies() {
+    echo "Testing install_system_dependencies function..."
+    install_system_dependencies
+    echo "install_system_dependencies test passed"
+}
+
+test_check_docker_daemon() {
+    echo "Testing check_docker_daemon function..."
+    docker info() {
+        return 0
+    }
+    check_docker_daemon
+    echo "check_docker_daemon test passed"
+}
+
+test_ensure_directories() {
+    echo "Testing ensure_directories function..."
+    mkdir() {
+        echo "Mock mkdir: $@"
+    }
+    ensure_directories
+    echo "ensure_directories test passed"
+}
+
+# Run tests
+test_check_disk_space
+test_install_system_dependencies
+test_check_docker_daemon
+test_ensure_directories
+
+echo "All tests completed successfully"

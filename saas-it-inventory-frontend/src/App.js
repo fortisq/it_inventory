@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ConfigurationProvider, useConfiguration } from './context/ConfigurationContext';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './components/Login';
@@ -13,6 +13,14 @@ import UserManagement from './components/UserManagement';
 import ConfigurationManagement from './components/ConfigurationManagement';
 import Navigation from './components/Navigation';
 import Profile from './components/Profile';
+
+const AdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
 
 const AppContent = () => {
   const { configurations, loading } = useConfiguration();
@@ -73,10 +81,12 @@ const AppContent = () => {
             }
           />
           <Route
-            path="/users"
+            path="/user-management"
             element={
               <PrivateRoute>
-                <UserManagement />
+                <AdminRoute>
+                  <UserManagement />
+                </AdminRoute>
               </PrivateRoute>
             }
           />
@@ -84,7 +94,9 @@ const AppContent = () => {
             path="/configuration"
             element={
               <PrivateRoute>
-                <ConfigurationManagement />
+                <AdminRoute>
+                  <ConfigurationManagement />
+                </AdminRoute>
               </PrivateRoute>
             }
           />

@@ -3,7 +3,6 @@ const crypto = require('crypto');
 
 const tenantSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  subdomain: { type: String, required: true, unique: true },
   subscriptionStatus: { type: String, enum: ['active', 'inactive', 'trial', 'cancelled'], default: 'trial' },
   subscriptionPlan: { type: String, enum: ['basic', 'pro', 'enterprise'], default: 'basic' },
   nextBillingDate: { type: Date },
@@ -29,7 +28,7 @@ const tenantSchema = new mongoose.Schema({
     secretKey: { type: String, set: encryptField, get: decryptField },
     webhookSecret: { type: String, set: encryptField, get: decryptField }
   }
-});
+}, { strict: 'throw' }); // This option will throw an error if we try to save a field not in the schema
 
 function encryptField(value) {
   if (!value) return;

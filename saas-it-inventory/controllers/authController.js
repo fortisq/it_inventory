@@ -29,12 +29,15 @@ exports.login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, username: user.username, role: user.role },
+      { userId: user._id, username: user.username, role: user.role, tenantId: user.tenantId },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
     logger.info("Login successful for user:", username);
+    logger.info("User role:", user.role);
+    logger.info("User tenantId:", user.tenantId);
+
     res.json({
       token,
       user: {
@@ -43,7 +46,8 @@ exports.login = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
+        tenantId: user.tenantId
       }
     });
   } catch (error) {
@@ -54,7 +58,7 @@ exports.login = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { username, email, password, firstName, lastName } = req.body;
+    const { username, email, password, firstName, lastName, tenantId, role } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -73,25 +77,33 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       firstName,
       lastName,
-      role: 'user' // Default role
+      role: role || 'user', // Default role is 'user' if not specified
+      tenantId
     });
 
     await user.save();
 
+    logger.info("New user registered:", user);
+
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
+    logger.error("Registration error:", error);
     errorHandler(error, req, res);
   }
 };
 
 exports.getCurrentUser = async (req, res) => {
   try {
+    logger.info("Getting current user. User ID:", req.user.userId);
     const user = await User.findById(req.user.userId).select('-password');
     if (!user) {
+      logger.warn("User not found for ID:", req.user.userId);
       return res.status(404).json({ message: 'User not found' });
     }
+    logger.info("Current user:", user);
     res.json(user);
   } catch (error) {
+    logger.error("Error getting current user:", error);
     errorHandler(error, req, res);
   }
 };
@@ -103,7 +115,7 @@ exports.updateProfile = async (req, res) => {
     logger.info('User ID from token:', req.user.userId);
     logger.info('Username from token:', req.user.username);
 
-    const user = await User.findOne({ username: req.user.username });
+    const user = await User.findOne({ _id: req.user.userId });
     
     if (!user) {
       logger.warn('User not found for profile update');
@@ -136,7 +148,8 @@ exports.updateProfile = async (req, res) => {
         lastName: user.lastName,
         role: user.role,
         jobTitle: user.jobTitle,
-        department: user.department
+        department: user.department,
+        tenantId: user.tenantId
       }
     });
   } catch (error) {
@@ -148,7 +161,7 @@ exports.updateProfile = async (req, res) => {
 exports.updatePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const user = await User.findById(req.user.userId);
+    const user = await User.findOne({ _id: req.user.userId });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

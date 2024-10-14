@@ -14,7 +14,9 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const assetRoutes = require('./routes/assetRoutes');
 const softwareSubscriptionRoutes = require('./routes/softwareSubscriptionRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const tenantRoutes = require('./routes/tenantRoutes');
 const configurationController = require('./controllers/configurationController');
+const tenantService = require('./services/tenantService');
 
 dotenv.config();
 
@@ -74,17 +76,21 @@ logger.info('Attempting to connect to MongoDB...');
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
 })
-.then(() => {
+.then(async () => {
   logger.info('Connected to MongoDB');
   logger.info('Loading Asset model...');
   const Asset = require('./models/Asset');
   logger.info('Asset model loaded');
   
+  // Remove subdomain index
+  await tenantService.removeSubdomainIndex();
+  logger.info('Subdomain index removed (if it existed)');
+
   // Initialize default configurations
-  configurationController.initializeDefaultConfigurations()
-    .then(() => logger.info('Default configurations initialized'))
-    .catch(err => logger.error('Error initializing default configurations:', err));
+  await configurationController.initializeDefaultConfigurations();
+  logger.info('Default configurations initialized');
 })
 .catch((err) => logger.error('MongoDB connection error:', err));
 
@@ -95,6 +101,7 @@ app.use('/api/configuration', configurationRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/tenants', tenantRoutes);
 
 // Add logging for asset routes
 app.use('/api/assets', (req, res, next) => {

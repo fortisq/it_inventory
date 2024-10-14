@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 import './Login.css';
 
 const Login = () => {
@@ -14,9 +15,24 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      await login(username, password);
-      navigate('/');
+      console.log('Attempting login with username:', username);
+      const user = await login(username, password);
+      console.log('Login successful:', user);
+      
+      // Check if token is set in localStorage
+      const token = localStorage.getItem('token');
+      console.log('Token in localStorage after login:', token);
+
+      // Check if token is set in api defaults
+      console.log('Token in api defaults:', api.defaults.headers.common['Authorization']);
+
+      if (user.role === 'admin' || user.role === 'superadmin' || user.role === 'tenantadmin') {
+        navigate('/user-management');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
+      console.error('Login error:', err);
       setError('Invalid username or password');
     }
   };

@@ -59,6 +59,17 @@ retry() {
     return 0
 }
 
+# Function to check for updates
+check_for_updates() {
+    log "Checking for updates..."
+    if [ -f "update.sh" ]; then
+        chmod +x update.sh
+        ./update.sh
+    else
+        log "Update script not found. Skipping update check."
+    fi
+}
+
 # Function to check and create necessary directories
 ensure_directories() {
     local dirs=("saas-it-inventory" "saas-it-inventory-frontend")
@@ -126,6 +137,9 @@ install_mongodb() {
 
 # Main setup function
 main_setup() {
+    # Check for updates
+    check_for_updates
+
     # Check if running as root
     if [ "$(id -u)" = "0" ]; then
         error "This script should not be run as root. Please run as a normal user."

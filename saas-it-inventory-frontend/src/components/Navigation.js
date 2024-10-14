@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useConfiguration } from '../context/ConfigurationContext';
 import './Navigation.css';
-import { FaBox, FaClipboardList, FaFileInvoiceDollar, FaChartBar, FaUsers, FaCog, FaUser, FaSignOutAlt, FaCaretDown } from 'react-icons/fa';
+import { FaBox, FaClipboardList, FaFileInvoiceDollar, FaChartBar, FaUsers, FaCog, FaUser, FaSignOutAlt, FaCaretDown, FaTachometerAlt } from 'react-icons/fa';
 
 const Navigation = () => {
   const { user, logout } = useAuth();
@@ -31,6 +31,7 @@ const Navigation = () => {
 
   const getIcon = (name) => {
     switch (name.toLowerCase()) {
+      case 'dashboard': return <FaTachometerAlt />;
       case 'assets': return <FaBox />;
       case 'inventory': return <FaClipboardList />;
       case 'subscriptions': return <FaFileInvoiceDollar />;
@@ -41,6 +42,14 @@ const Navigation = () => {
     }
   };
 
+  const mainNavItems = [
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Assets', path: '/assets' },
+    { name: 'Inventory', path: '/inventory' },
+    { name: 'Subscriptions', path: '/subscriptions' },
+    { name: 'Reports', path: '/reports' },
+  ];
+
   return (
     <nav className="navbar">
       <div className="navbar-content">
@@ -49,17 +58,17 @@ const Navigation = () => {
         </div>
         {user && (
           <ul className="navbar-nav">
-            {navLinks.map((link) => (
-              <li key={link.path} className="nav-item">
-                <Link to={link.path}>
-                  {getIcon(link.name)} {link.name}
+            {mainNavItems.map((item) => (
+              <li key={item.path} className="nav-item">
+                <Link to={item.path}>
+                  {getIcon(item.name)} {item.name}
                 </Link>
               </li>
             ))}
             {user.role === 'admin' && (
               <>
                 <li className="nav-item">
-                  <Link to="/users"><FaUsers /> User Management</Link>
+                  <Link to="/user-management"><FaUsers /> User Management</Link>
                 </li>
                 <li className="nav-item">
                   <Link to="/configuration"><FaCog /> Configuration</Link>

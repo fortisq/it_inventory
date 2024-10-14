@@ -1,16 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const configurationController = require('../controllers/configurationController');
-const authMiddleware = require('../middleware/authMiddleware');
-const isAdmin = require('../middleware/isAdminMiddleware');
+const { authMiddleware, isSuperAdmin, isTenantAdminOrSuperAdmin } = require('../middleware/authMiddleware');
 
 // Apply authMiddleware to all routes in this file
 router.use(authMiddleware);
 
 router.get('/', configurationController.getConfigurations);
-router.post('/', isAdmin, configurationController.createConfiguration);
-router.put('/', isAdmin, configurationController.updateConfiguration);
-router.delete('/:key', isAdmin, configurationController.deleteConfiguration);
+router.post('/', isTenantAdminOrSuperAdmin, configurationController.createConfiguration);
+router.put('/', isTenantAdminOrSuperAdmin, configurationController.updateConfiguration);
+router.delete('/:key', isTenantAdminOrSuperAdmin, configurationController.deleteConfiguration);
 
 // Add these new routes
 router.get('/systems', configurationController.getSystems);
