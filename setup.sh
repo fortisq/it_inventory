@@ -237,6 +237,10 @@ main_setup() {
     # Ensure necessary directories exist
     ensure_directories
 
+    # Clear npm cache
+    log "Clearing npm cache..."
+    npm cache clean --force
+
     # Install frontend dependencies
     log "Installing frontend dependencies..."
     cd saas-it-inventory-frontend || error "Failed to navigate to frontend directory"
