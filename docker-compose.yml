@@ -7,11 +7,11 @@ services:
       - "3000:3000"
     environment:
       - MONGODB_URI=mongodb://mongo:27017/it_inventory
-      - JWT_SECRET=${JWT_SECRET}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - JWT_SECRET=${JWT_SECRET:-defaultsecret}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-defaultencryptionkey}
       - NODE_ENV=production
       - PORT=3000
-      - FRONTEND_URL=http://localhost:8080
+      - FRONTEND_URL=http://localhost:80
     depends_on:
       mongo:
         condition: service_healthy
@@ -27,7 +27,7 @@ services:
       context: ./saas-it-inventory-frontend
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "80:80"
     environment:
       - REACT_APP_API_URL=http://localhost:3000/api
     depends_on:
@@ -35,7 +35,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
       interval: 30s
       timeout: 10s
       retries: 3
