@@ -7,13 +7,12 @@ import { FaBox, FaClipboardList, FaFileInvoiceDollar, FaChartBar, FaUsers, FaCog
 
 const Navigation = () => {
   const { user, logout } = useAuth();
-  const { getConfigValue, getNavLinks } = useConfiguration();
+  const { getConfigValue } = useConfiguration();
   const navigate = useNavigate();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const applicationTitle = getConfigValue('application_title', 'IT Inventory');
-  const navLinks = getNavLinks();
 
   const handleLogout = () => {
     logout();

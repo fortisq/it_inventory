@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { applyConfigurations, getConfigValue, getNavLinks } from '../utils/ConfigurationManager';
 import config from '../config';
 
@@ -11,21 +11,11 @@ export const ConfigurationProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchConfigurations();
+  const getAuthToken = useCallback(() => {
+    return localStorage.getItem('token');
   }, []);
 
-  useEffect(() => {
-    if (Object.keys(configurations).length > 0) {
-      applyConfigurations(configurations);
-    }
-  }, [configurations]);
-
-  const getAuthToken = () => {
-    return localStorage.getItem('token');
-  };
-
-  const fetchConfigurations = async () => {
+  const fetchConfigurations = useCallback(async () => {
     try {
       console.log('Fetching configurations...');
       console.log('API URL:', `${config.apiUrl}/api/configuration`);
@@ -49,7 +39,17 @@ export const ConfigurationProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getAuthToken]);
+
+  useEffect(() => {
+    fetchConfigurations();
+  }, [fetchConfigurations]);
+
+  useEffect(() => {
+    if (Object.keys(configurations).length > 0) {
+      applyConfigurations(configurations);
+    }
+  }, [configurations]);
 
   const updateConfiguration = async (key, value) => {
     try {
