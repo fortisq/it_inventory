@@ -11,7 +11,7 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - NODE_ENV=production
       - PORT=3000
-      - FRONTEND_URL=http://localhost
+      - FRONTEND_URL=http://localhost:8080
     depends_on:
       mongo:
         condition: service_healthy
@@ -27,13 +27,18 @@ services:
       context: ./saas-it-inventory-frontend
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "8080:8080"
     environment:
       - REACT_APP_API_URL=http://localhost:3000/api
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mongo:
     image: mongo:4.4
