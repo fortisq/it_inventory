@@ -184,17 +184,17 @@ main_setup() {
         npm_version=$(npm --version)
         log "Node.js version: $node_version"
         log "npm version: $npm_version"
-        if version_ge "$node_version" "16.0.0"; then
-            log "Node.js version is 16.x or higher. Proceeding with installation."
+        if version_ge "$node_version" "18.0.0"; then
+            log "Node.js version is 18.x or higher. Proceeding with installation."
         else
-            log "Node.js version is below 16.x. Attempting to install Node.js 16.x..."
-            curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-            sudo apt-get install -y nodejs || error "Failed to install Node.js 16.x"
+            log "Node.js version is below 18.x. Attempting to install Node.js 18.x..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs || error "Failed to install Node.js 18.x"
         fi
     else
-        log "Node.js is not installed. Installing Node.js 16.x..."
-        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-        sudo apt-get install -y nodejs || error "Failed to install Node.js 16.x"
+        log "Node.js is not installed. Installing Node.js 18.x..."
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt-get install -y nodejs || error "Failed to install Node.js 18.x"
     fi
 
     # Install Docker
