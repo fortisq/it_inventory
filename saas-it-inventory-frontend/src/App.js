@@ -1,75 +1,95 @@
-import React, { useContext } from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
-import { AuthProvider, AuthContext } from './context/AuthContext';
-import ErrorBoundary from './components/ErrorBoundary';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import Navigation from './components/Navigation';
 import Inventory from './components/Inventory';
 import Assets from './components/Assets';
-import SoftwareSubscriptions from './components/SoftwareSubscriptions';
+import Subscriptions from './components/Subscriptions';
 import Reports from './components/Reports';
-import Profile from './components/Profile';
-import HelpSupport from './components/HelpSupport';
 import UserManagement from './components/UserManagement';
-import DataVisualization from './components/DataVisualization';
-import NotFound from './components/NotFound';
-import Loading from './components/Loading';
-import './styles/main.css';
-
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-  const { user, loading } = useContext(AuthContext);
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        user ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to={{ pathname: "/login", state: { from: props.location } }} />
-        )
-      }
-    />
-  );
-};
-
-const Layout = ({ children }) => (
-  <div className="App">
-    <Navigation />
-    <div className="container">{children}</div>
-  </div>
-);
+import ConfigurationManagement from './components/ConfigurationManagement';
+import Navigation from './components/Navigation';
+import UserProfile from './components/UserProfile';
 
 function App() {
   return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <Router>
-          <Layout>
-            <Switch>
-              <Route exact path="/login" component={Login} />
-              <ProtectedRoute path="/dashboard" component={Dashboard} />
-              <ProtectedRoute path="/inventory" component={Inventory} />
-              <ProtectedRoute path="/assets" component={Assets} />
-              <ProtectedRoute path="/software-subscriptions" component={SoftwareSubscriptions} />
-              <ProtectedRoute path="/reports" component={Reports} />
-              <ProtectedRoute path="/profile" component={Profile} />
-              <ProtectedRoute path="/help-support" component={HelpSupport} />
-              <ProtectedRoute path="/user-management" component={UserManagement} />
-              <ProtectedRoute path="/data-visualization" component={DataVisualization} />
-              <Route path="/404" component={NotFound} />
-              <Redirect exact from="/" to="/dashboard" />
-              <Redirect to="/404" />
-            </Switch>
-          </Layout>
-        </Router>
-      </AuthProvider>
-    </ErrorBoundary>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Navigation />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/inventory"
+              element={
+                <PrivateRoute>
+                  <Inventory />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/assets"
+              element={
+                <PrivateRoute>
+                  <Assets />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/subscriptions"
+              element={
+                <PrivateRoute>
+                  <Subscriptions />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <PrivateRoute>
+                  <Reports />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/user-management"
+              element={
+                <PrivateRoute>
+                  <UserManagement />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/configuration-management"
+              element={
+                <PrivateRoute>
+                  <ConfigurationManagement />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <UserProfile />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

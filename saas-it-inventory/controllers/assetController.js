@@ -1,78 +1,93 @@
 const Asset = require('../models/Asset');
 
-exports.getAssets = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const search = req.query.search || '';
-    const skip = (page - 1) * limit;
+const assetController = {
+  getAssets: async (req, res) => {
+    try {
+      const { page = 1, limit = 10, search = '' } = req.query;
+      const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        sort: { createdAt: -1 },
+        populate: [
+          { path: 'createdBy', select: 'username' },
+          { path: 'updatedBy', select: 'username' }
+        ]
+      };
 
-    const searchRegex = new RegExp(search, 'i');
-    const query = {
-      $or: [
-        { name: searchRegex },
-        { type: searchRegex }
-      ]
-    };
+      const query = search
+        ? {
+            $or: [
+              { name: { $regex: search, $options: 'i' } },
+              { type: { $regex: search, $options: 'i' } },
+              { status: { $regex: search, $options: 'i' } },
+              { assignedTo: { $regex: search, $options: 'i' } }
+            ]
+          }
+        : {};
 
-    const totalAssets = await Asset.countDocuments(query);
-    const assets = await Asset.find(query).skip(skip).limit(limit);
-
-    res.json({
-      assets,
-      currentPage: page,
-      totalPages: Math.ceil(totalAssets / limit),
-      totalAssets
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching assets', error: error.message });
-  }
-};
-
-exports.addAsset = async (req, res) => {
-  try {
-    const { name, type, status, assignedTo } = req.body;
-    const newAsset = new Asset({
-      name,
-      type,
-      status,
-      assignedTo,
-      createdBy: req.user._id
-    });
-    await newAsset.save();
-    res.status(201).json(newAsset);
-  } catch (error) {
-    res.status(500).json({ message: 'Error adding asset', error: error.message });
-  }
-};
-
-exports.updateAsset = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, type, status, assignedTo } = req.body;
-    const updatedAsset = await Asset.findByIdAndUpdate(
-      id,
-      { name, type, status, assignedTo },
-      { new: true }
-    );
-    if (!updatedAsset) {
-      return res.status(404).json({ message: 'Asset not found' });
+      const result = await Asset.paginate(query, options);
+      res.json({
+        assets: result.docs,
+        totalPages: result.totalPages,
+        currentPage: result.page,
+        totalAssets: result.totalDocs
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-    res.json(updatedAsset);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating asset', error: error.message });
+  },
+
+  addAsset: async (req, res) => {
+    try {
+      const assetData = {
+        ...req.body,
+        createdBy: req.user._id,
+        updatedBy: req.user._id
+      };
+
+      const asset = new Asset(assetData);
+      
+      // Calculate next maintenance date
+      asset.nextMaintenanceDate = asset.calculateNextMaintenanceDate();
+
+      const newAsset = await asset.save();
+      res.status(201).json(newAsset);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
+  updateAsset: async (req, res) => {
+    try {
+      const asset = await Asset.findById(req.params.id);
+      if (!asset) {
+        return res.status(404).json({ message: 'Asset not found' });
+      }
+
+      // Update asset fields
+      Object.assign(asset, req.body);
+      asset.updatedBy = req.user._id;
+
+      // Recalculate next maintenance date if necessary
+      if (req.body.lastMaintenanceDate || req.body.maintenanceFrequency) {
+        asset.nextMaintenanceDate = asset.calculateNextMaintenanceDate();
+      }
+
+      const updatedAsset = await asset.save();
+      res.json(updatedAsset);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
+  deleteAsset: async (req, res) => {
+    try {
+      await Asset.findByIdAndDelete(req.params.id);
+      res.json({ message: 'Asset deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 };
 
-exports.deleteAsset = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deletedAsset = await Asset.findByIdAndDelete(id);
-    if (!deletedAsset) {
-      return res.status(404).json({ message: 'Asset not found' });
-    }
-    res.json({ message: 'Asset deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting asset', error: error.message });
-  }
-};
+module.exports = assetController;

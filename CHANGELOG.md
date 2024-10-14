@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Protected routes for authenticated users
 - Loading component for asynchronous operations
 - Not Found (404) page for unmatched routes
+- Pagination for inventory, assets, and software subscriptions lists
+- Search functionality for inventory, assets, and software subscriptions
 
 ### Changed
 - Updated server.js to include all new routes
@@ -25,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated README.md with comprehensive project information and instructions
 - Improved error handling and logging across the application
 - Implemented pagination for data retrieval in backend APIs
+- Updated React Router to version 6
+- Refactored AuthContext for better performance and dependency management
+
+### Fixed
+- Resolved ESLint warnings related to React hooks dependencies
+- Fixed accessibility issues in the Navigation component
 
 ### Security
 - Implemented automatic generation of JWT_SECRET and ENCRYPTION_KEY in setup script

@@ -30,7 +30,9 @@ IT Inventory is a comprehensive solution designed to help organizations efficien
 - User Management: Manage user accounts, roles, and permissions.
 - Reporting and Analytics: Generate custom reports and gain insights into asset utilization and costs.
 - Dashboard: Get a quick overview of key metrics and alerts.
-- Data Visualization: Visualize inventory data, asset distribution, and trends.
+- Data Visualization: Visualize inventory data, asset distribution, and trends using interactive charts.
+- Pagination: Efficiently navigate through large datasets in inventory, assets, and software subscriptions lists.
+- Search Functionality: Quickly find specific items in inventory, assets, and software subscriptions.
 
 ## System Requirements
 
@@ -44,6 +46,7 @@ IT Inventory is a comprehensive solution designed to help organizations efficien
 
 - Ubuntu-based system (tested on Ubuntu 20.04 LTS)
 - Sudo privileges
+- Git
 
 ## Installation and Setup
 
@@ -111,6 +114,7 @@ For local development without Docker:
 - If you encounter issues with Docker, ensure the Docker daemon is running: `sudo systemctl start docker`
 - For database connection issues, check if MongoDB is running: `docker-compose ps`
 - If the frontend is not accessible, verify that the REACT_APP_API_URL in the frontend .env file is correct
+- Check the application logs for any error messages: `docker-compose logs -f`
 
 ## Security Considerations
 
@@ -119,12 +123,14 @@ For local development without Docker:
 - Enable two-factor authentication for admin accounts
 - Regularly review and audit user access and permissions
 - Keep your host system and Docker installation up to date
+- Implement network security measures (firewalls, VPNs) to protect the application
 
 ## Backups and Data Management
 
 - Regular backups are crucial. Set up automated backups of the MongoDB database
 - Store backups securely, preferably in an off-site location
 - Regularly test the restoration process to ensure backups are valid
+- Implement a data retention policy in compliance with relevant regulations
 
 ## Customization and Extending the Application
 

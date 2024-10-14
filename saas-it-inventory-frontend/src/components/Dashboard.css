@@ -1,129 +1,134 @@
 .dashboard {
-  max-width: 800px;
-  margin: 0 auto;
   padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.dashboard h2 {
+.dashboard-title {
+  text-align: center;
   color: #333;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
+  margin-bottom: 30px;
 }
 
-.menu-toggle {
-  display: none;
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.dashboard-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.summary-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 30%;
+  text-align: center;
+}
+
+.summary-card h3 {
+  margin: 0;
+  color: #555;
+  font-size: 1.2em;
+}
+
+.summary-value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #007bff;
+  margin: 10px 0 0;
+}
+
+.dashboard-charts {
+  display: flex;
+  justify-content: space-between;
+}
+
+.chart-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 48%;
+}
+
+.chart-container h3 {
+  margin-top: 0;
+  color: #555;
+  text-align: center;
+}
+
+.asset-distribution-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200px;
+}
+
+.asset-bar {
+  width: 40px;
+  min-height: 1px;
+  position: relative;
+  transition: height 0.3s ease;
+}
+
+.asset-label {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8em;
+  color: #555;
+  white-space: nowrap;
+}
+
+.asset-count {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.inventory-status-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.status-pie-chart {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+}
+
+.status-legend {
+  display: flex;
+  flex-direction: column;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
   margin-bottom: 10px;
 }
 
-.dashboard-menu {
-  list-style-type: none;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.dashboard-menu li {
-  flex: 1 1 calc(33.333% - 10px);
-  min-width: 200px;
-}
-
-.dashboard-menu a {
-  display: block;
-  padding: 15px;
-  background-color: #f0f0f0;
-  color: #333;
-  text-decoration: none;
-  text-align: center;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.dashboard-menu a:hover {
-  background-color: #e0e0e0;
-}
-
-.user-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-}
-
-.profile-link {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.logout-button {
-  padding: 10px 20px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-}
-
-.logout-button:hover {
-  background-color: #c82333;
-}
-
-.logout-button:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
-.spinner {
-  display: inline-block;
+.legend-color {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255,255,255,.3);
   border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
   margin-right: 10px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.dashboard-loading,
+.dashboard-error,
+.dashboard-no-data {
+  text-align: center;
+  font-size: 1.2em;
+  color: #555;
+  margin-top: 50px;
 }
 
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: block;
-  }
-
-  .dashboard-menu {
-    display: none;
-    flex-direction: column;
-  }
-
-  .dashboard-menu.open {
-    display: flex;
-  }
-
-  .dashboard-menu li {
-    width: 100%;
-  }
-
-  .user-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .profile-link, .logout-button {
-    margin-top: 10px;
-    text-align: center;
-  }
+.dashboard-error {
+  color: #f44336;
 }

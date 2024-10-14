@@ -1,20 +1,37 @@
 const Asset = require('../models/Asset');
-const SoftwareSubscription = require('../models/SoftwareSubscription');
 const Inventory = require('../models/Inventory');
+const Subscription = require('../models/Subscription');
 
-exports.getDashboardStats = async (req, res) => {
+exports.getDashboardData = async (req, res) => {
   try {
     const totalAssets = await Asset.countDocuments();
-    const activeSubscriptions = await SoftwareSubscription.countDocuments({ status: 'active' });
-    const lowStockItems = await Inventory.countDocuments({ quantity: { $lt: 10 } });
+    const totalInventoryItems = await Inventory.countDocuments();
+    const activeSoftwareSubscriptions = await Subscription.countDocuments({ status: 'active' });
+
+    const assetDistribution = await Asset.aggregate([
+      { $group: { _id: '$type', count: { $sum: 1 } } }
+    ]);
+
+    const inventoryStatus = await Inventory.aggregate([
+      {
+        $group: {
+          _id: null,
+          inStock: { $sum: { $cond: [{ $gt: ['$quantity', 10] }, 1, 0] } },
+          lowStock: { $sum: { $cond: [{ $and: [{ $lte: ['$quantity', 10] }, { $gt: ['$quantity', 0] }] }, 1, 0] } },
+          outOfStock: { $sum: { $cond: [{ $eq: ['$quantity', 0] }, 1, 0] } }
+        }
+      }
+    ]);
 
     res.json({
       totalAssets,
-      activeSubscriptions,
-      lowStockItems
+      totalInventoryItems,
+      activeSoftwareSubscriptions,
+      assetDistribution: Object.fromEntries(assetDistribution.map(item => [item._id, item.count])),
+      inventoryStatus: inventoryStatus[0] || { inStock: 0, lowStock: 0, outOfStock: 0 }
     });
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
-    res.status(500).json({ message: 'Error fetching dashboard stats' });
+    console.error('Error fetching dashboard data:', error);
+    res.status(500).json({ message: 'Error fetching dashboard data' });
   }
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bar, Pie, Line } from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import api from '../services/api';
 

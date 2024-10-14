@@ -1,52 +1,317 @@
 const Asset = require('../models/Asset');
-const SoftwareSubscription = require('../models/SoftwareSubscription');
+const Subscription = require('../models/Subscription');
+const Inventory = require('../models/Inventory');
+const PDFDocument = require('pdfkit');
+const ExcelJS = require('exceljs');
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 
 exports.getAssetReport = async (req, res) => {
   try {
-    const totalAssets = await Asset.countDocuments();
-    const assetsByStatus = await Asset.aggregate([
-      { $group: { _id: '$status', count: { $sum: 1 } } }
-    ]);
-    const assetsByType = await Asset.aggregate([
-      { $group: { _id: '$type', count: { $sum: 1 } } }
-    ]);
-
-    const report = {
-      totalAssets,
-      assetsByStatus: Object.fromEntries(assetsByStatus.map(item => [item._id, item.count])),
-      assetsByType: Object.fromEntries(assetsByType.map(item => [item._id, item.count]))
-    };
-
-    res.json(report);
+    const assetData = await fetchAssetData();
+    res.json(assetData);
   } catch (error) {
-    res.status(500).json({ message: 'Error generating asset report', error: error.message });
+    console.error('Error fetching asset report:', error);
+    res.status(500).json({ message: 'Error fetching asset report', error: error.message });
   }
 };
 
 exports.getSubscriptionReport = async (req, res) => {
   try {
-    const totalSubscriptions = await SoftwareSubscription.countDocuments();
-    const totalSeats = await SoftwareSubscription.aggregate([
-      { $group: { _id: null, total: { $sum: '$seats' } } }
-    ]);
-    const subscriptionsByVendor = await SoftwareSubscription.aggregate([
-      { $group: { _id: '$vendor', count: { $sum: 1 } } }
-    ]);
-    const thirtyDaysFromNow = new Date();
-    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-    const expiringSoon = await SoftwareSubscription.countDocuments({
-      expirationDate: { $lte: thirtyDaysFromNow, $gte: new Date() }
-    });
-
-    const report = {
-      totalSubscriptions,
-      totalSeats: totalSeats[0]?.total || 0,
-      subscriptionsByVendor: Object.fromEntries(subscriptionsByVendor.map(item => [item._id, item.count])),
-      expiringSoon
-    };
-
-    res.json(report);
+    const subscriptionData = await fetchSubscriptionData();
+    res.json(subscriptionData);
   } catch (error) {
-    res.status(500).json({ message: 'Error generating subscription report', error: error.message });
+    console.error('Error fetching subscription report:', error);
+    res.status(500).json({ message: 'Error fetching subscription report', error: error.message });
   }
+};
+
+exports.getInventoryReport = async (req, res) => {
+  try {
+    const inventoryData = await fetchInventoryData();
+    res.json(inventoryData);
+  } catch (error) {
+    console.error('Error fetching inventory report:', error);
+    res.status(500).json({ message: 'Error fetching inventory report', error: error.message });
+  }
+};
+
+exports.generateReport = async (req, res) => {
+  const { reportType, format } = req.params;
+
+  try {
+    let data;
+    switch (reportType) {
+      case 'assets':
+        data = await fetchAssetData();
+        break;
+      case 'subscriptions':
+        data = await fetchSubscriptionData();
+        break;
+      case 'inventory':
+        data = await fetchInventoryData();
+        break;
+      case 'all':
+        data = {
+          assets: await fetchAssetData(),
+          subscriptions: await fetchSubscriptionData(),
+          inventory: await fetchInventoryData()
+        };
+        break;
+      default:
+        return res.status(400).json({ message: 'Invalid report type' });
+    }
+
+    if (format === 'pdf') {
+      const pdfBuffer = await generatePDFReport(data, reportType);
+      res.contentType('application/pdf');
+      res.send(pdfBuffer);
+    } else if (format === 'excel') {
+      const excelBuffer = await generateExcelReport(data, reportType);
+      res.contentType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.attachment(`${reportType}_report.xlsx`);
+      res.send(excelBuffer);
+    } else {
+      res.status(400).json({ message: 'Invalid format' });
+    }
+  } catch (error) {
+    console.error('Error generating report:', error);
+    res.status(500).json({ message: 'Error generating report', error: error.message });
+  }
+};
+
+async function fetchAssetData() {
+  const totalAssets = await Asset.countDocuments();
+  const totalAssetValue = await Asset.aggregate([
+    { $group: { _id: null, total: { $sum: '$value' } } }
+  ]);
+  const assetsNeedingMaintenance = await Asset.countDocuments({ needsMaintenance: true });
+  const assetsByStatus = await Asset.aggregate([
+    { $group: { _id: '$status', count: { $sum: 1 } } }
+  ]);
+  const assetsByType = await Asset.aggregate([
+    { $group: { _id: '$type', count: { $sum: 1 } } }
+  ]);
+  const assetAgeDistribution = await Asset.aggregate([
+    {
+      $project: {
+        age: {
+          $floor: {
+            $divide: [{ $subtract: [new Date(), '$purchaseDate'] }, 365 * 24 * 60 * 60 * 1000]
+          }
+        }
+      }
+    },
+    { $group: { _id: '$age', count: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]);
+
+  return {
+    totalAssets,
+    totalAssetValue: totalAssetValue[0]?.total || 0,
+    assetsNeedingMaintenance,
+    assetsByStatus: Object.fromEntries(assetsByStatus.map(item => [item._id, item.count])),
+    assetsByType: Object.fromEntries(assetsByType.map(item => [item._id, item.count])),
+    assetAgeDistribution: Object.fromEntries(assetAgeDistribution.map(item => [item._id, item.count]))
+  };
+}
+
+async function fetchSubscriptionData() {
+  const totalSubscriptions = await Subscription.countDocuments();
+  const totalSeats = await Subscription.aggregate([
+    { $group: { _id: null, total: { $sum: '$seats' } } }
+  ]);
+  const totalCost = await Subscription.aggregate([
+    { $group: { _id: null, total: { $sum: '$cost' } } }
+  ]);
+  const expiringSoon = await Subscription.countDocuments({
+    expirationDate: { $lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }
+  });
+  const subscriptionsByVendor = await Subscription.aggregate([
+    { $group: { _id: '$vendor', count: { $sum: 1 } } }
+  ]);
+  const subscriptionDurationDistribution = await Subscription.aggregate([
+    {
+      $project: {
+        duration: {
+          $floor: {
+            $divide: [{ $subtract: ['$expirationDate', '$startDate'] }, 30 * 24 * 60 * 60 * 1000]
+          }
+        },
+        cost: 1,
+        seats: 1
+      }
+    },
+    {
+      $group: {
+        _id: '$duration',
+        count: { $sum: 1 },
+        totalCost: { $sum: '$cost' },
+        totalLicenses: { $sum: '$seats' }
+      }
+    },
+    { $sort: { _id: 1 } }
+  ]);
+
+  return {
+    totalSubscriptions,
+    totalSeats: totalSeats[0]?.total || 0,
+    totalCost: totalCost[0]?.total || 0,
+    expiringSoon,
+    subscriptionsByVendor: Object.fromEntries(subscriptionsByVendor.map(item => [item._id, item.count])),
+    subscriptionDurationDistribution: subscriptionDurationDistribution.map(item => ({
+      duration: `${item._id} months`,
+      count: item.count,
+      totalCost: item.totalCost,
+      totalLicenses: item.totalLicenses
+    }))
+  };
+}
+
+async function fetchInventoryData() {
+  const totalItems = await Inventory.countDocuments();
+  const totalValue = await Inventory.aggregate([
+    { $group: { _id: null, total: { $sum: { $multiply: ['$quantity', '$unitCost'] } } } }
+  ]);
+  const lowStockItems = await Inventory.countDocuments({ 
+    $expr: { $lt: ['$quantity', '$reorderPoint'] }
+  });
+  const itemsByCategory = await Inventory.aggregate([
+    { $group: { _id: '$category', count: { $sum: 1 } } }
+  ]);
+  const itemsByLocation = await Inventory.aggregate([
+    { $group: { _id: '$location', count: { $sum: 1 } } }
+  ]);
+  const averageTurnoverRate = await Inventory.aggregate([
+    {
+      $group: {
+        _id: null,
+        avgTurnover: { $avg: '$turnoverRate' }
+      }
+    }
+  ]);
+
+  return {
+    totalItems,
+    totalValue: totalValue[0]?.total || 0,
+    lowStockItems,
+    itemsByCategory: Object.fromEntries(itemsByCategory.map(item => [item._id, item.count])),
+    itemsByLocation: Object.fromEntries(itemsByLocation.map(item => [item._id, item.count])),
+    averageTurnoverRate: averageTurnoverRate[0]?.avgTurnover || 0
+  };
+}
+
+async function generatePDFReport(data, reportType) {
+  const doc = new PDFDocument();
+  let buffers = [];
+  doc.on('data', buffers.push.bind(buffers));
+  doc.on('end', () => {});
+
+  doc.fontSize(18).text(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report`, { align: 'center' });
+  doc.moveDown();
+
+  if (reportType === 'all') {
+    for (const [key, value] of Object.entries(data)) {
+      await addReportSection(doc, key, value);
+    }
+  } else {
+    await addReportSection(doc, reportType, data);
+  }
+
+  doc.end();
+  return Buffer.concat(buffers);
+}
+
+async function addReportSection(doc, sectionName, sectionData) {
+  doc.fontSize(14).text(sectionName.charAt(0).toUpperCase() + sectionName.slice(1));
+  doc.moveDown(0.5);
+
+  for (const [key, value] of Object.entries(sectionData)) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      doc.fontSize(12).text(key.charAt(0).toUpperCase() + key.slice(1) + ':');
+      doc.moveDown(0.2);
+      const chartBuffer = await generateChart(value, key);
+      doc.image(chartBuffer, { width: 400 });
+    } else {
+      doc.fontSize(12).text(`${key}: ${JSON.stringify(value)}`);
+    }
+    doc.moveDown(0.5);
+  }
+  doc.moveDown();
+}
+
+async function generateChart(data, title) {
+  const width = 600;
+  const height = 400;
+  const chartCallback = (ChartJS) => {
+    ChartJS.defaults.responsive = true;
+    ChartJS.defaults.maintainAspectRatio = false;
+  };
+  const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, chartCallback });
+
+  const configuration = {
+    type: 'bar',
+    data: {
+      labels: Object.keys(data),
+      datasets: [{
+        label: title,
+        data: Object.values(data),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      plugins: {
+        title: {
+          display: true,
+          text: title
+        }
+      }
+    }
+  };
+
+  const image = await chartJSNodeCanvas.renderToBuffer(configuration);
+  return image;
+}
+
+async function generateExcelReport(data, reportType) {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(reportType);
+
+  worksheet.addRow([`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report`]);
+  worksheet.addRow([]);
+
+  if (reportType === 'all') {
+    for (const [key, value] of Object.entries(data)) {
+      await addExcelSection(worksheet, key, value);
+    }
+  } else {
+    await addExcelSection(worksheet, reportType, data);
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  return buffer;
+}
+
+async function addExcelSection(worksheet, sectionName, sectionData) {
+  worksheet.addRow([sectionName.charAt(0).toUpperCase() + sectionName.slice(1)]);
+  
+  for (const [key, value] of Object.entries(sectionData)) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      worksheet.addRow([key.charAt(0).toUpperCase() + key.slice(1)]);
+      for (const [subKey, subValue] of Object.entries(value)) {
+        worksheet.addRow([subKey, subValue]);
+      }
+    } else {
+      worksheet.addRow([key, JSON.stringify(value)]);
+    }
+  }
+  worksheet.addRow([]);
+}
+
+module.exports = {
+  getAssetReport: exports.getAssetReport,
+  getSubscriptionReport: exports.getSubscriptionReport,
+  getInventoryReport: exports.getInventoryReport,
+  generateReport: exports.generateReport
 };

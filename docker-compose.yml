@@ -19,7 +19,9 @@ services:
       retries: 3
 
   frontend:
-    build: ./saas-it-inventory-frontend
+    build:
+      context: ./saas-it-inventory-frontend
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     environment:

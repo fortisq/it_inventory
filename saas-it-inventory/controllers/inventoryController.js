@@ -1,112 +1,97 @@
 const Inventory = require('../models/Inventory');
-const logger = require('../utils/logger');
 
-exports.getAllInventoryItems = async (req, res) => {
+exports.getInventory = async (req, res) => {
   try {
-    const inventoryItems = await Inventory.find().sort({ createdAt: -1 });
-    res.json(inventoryItems);
-  } catch (error) {
-    logger.error('Error fetching inventory:', error);
-    res.status(500).json({ message: 'Error fetching inventory', error: error.message });
-  }
-};
+    const { page = 1, limit = 10, search = '' } = req.query;
+    const query = search
+      ? { name: { $regex: search, $options: 'i' } }
+      : {};
 
-exports.createInventoryItem = async (req, res) => {
-  try {
-    const { name, description, quantity } = req.body;
-    const newItem = new Inventory({
-      name,
-      description,
-      quantity,
-      createdBy: req.user._id
+    const items = await Inventory.find(query)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+
+    const count = await Inventory.countDocuments(query);
+
+    res.json({
+      items,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
     });
-    await newItem.save();
-    logger.info(`New inventory item created: ${newItem._id}`);
-    res.status(201).json(newItem);
   } catch (error) {
-    logger.error('Error adding inventory item:', error);
-    res.status(500).json({ message: 'Error adding inventory item', error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.getInventoryItem = async (req, res) => {
+exports.addInventoryItem = async (req, res) => {
   try {
-    const { id } = req.params;
-    const item = await Inventory.findById(id);
-    if (!item) {
-      return res.status(404).json({ message: 'Inventory item not found' });
-    }
-    res.json(item);
+    const newItem = new Inventory({
+      ...req.body,
+      createdBy: req.user._id, // Add the user ID from the authenticated request
+      updatedBy: req.user._id
+    });
+    const savedItem = await newItem.save();
+    res.status(201).json(savedItem);
   } catch (error) {
-    logger.error(`Error fetching inventory item ${req.params.id}:`, error);
-    res.status(500).json({ message: 'Error fetching inventory item', error: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
 exports.updateInventoryItem = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, description, quantity } = req.body;
     const updatedItem = await Inventory.findByIdAndUpdate(
-      id,
-      { name, description, quantity },
-      { new: true, runValidators: true }
+      req.params.id,
+      { ...req.body, updatedBy: req.user._id },
+      { new: true }
     );
     if (!updatedItem) {
       return res.status(404).json({ message: 'Inventory item not found' });
     }
-    logger.info(`Inventory item updated: ${id}`);
     res.json(updatedItem);
   } catch (error) {
-    logger.error(`Error updating inventory item ${req.params.id}:`, error);
-    res.status(500).json({ message: 'Error updating inventory item', error: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
 exports.deleteInventoryItem = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deletedItem = await Inventory.findByIdAndDelete(id);
+    const deletedItem = await Inventory.findByIdAndDelete(req.params.id);
     if (!deletedItem) {
       return res.status(404).json({ message: 'Inventory item not found' });
     }
-    logger.info(`Inventory item deleted: ${id}`);
     res.json({ message: 'Inventory item deleted successfully' });
   } catch (error) {
-    logger.error(`Error deleting inventory item ${req.params.id}:`, error);
-    res.status(500).json({ message: 'Error deleting inventory item', error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.getPaginatedInventoryItems = async (req, res) => {
+exports.getCategories = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const options = {
-      page: parseInt(page, 10),
-      limit: parseInt(limit, 10),
-      sort: { createdAt: -1 }
-    };
-
-    const inventoryItems = await Inventory.paginate({}, options);
-    res.json(inventoryItems);
+    const categories = await Inventory.distinct('category');
+    res.json(categories);
   } catch (error) {
-    logger.error('Error fetching paginated inventory:', error);
-    res.status(500).json({ message: 'Error fetching paginated inventory', error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.searchInventoryItems = async (req, res) => {
+exports.addCategory = async (req, res) => {
   try {
-    const { query } = req.params;
-    const inventoryItems = await Inventory.find({
-      $or: [
-        { name: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } }
-      ]
-    }).sort({ createdAt: -1 });
-    res.json(inventoryItems);
+    const { category } = req.body;
+    const existingCategory = await Inventory.findOne({ category });
+    if (existingCategory) {
+      return res.status(400).json({ message: 'Category already exists' });
+    }
+    const newItem = new Inventory({
+      category,
+      name: 'Placeholder Item',
+      quantity: 0,
+      createdBy: req.user._id,
+      updatedBy: req.user._id
+    });
+    await newItem.save();
+    res.status(201).json({ message: 'Category added successfully' });
   } catch (error) {
-    logger.error(`Error searching inventory items with query "${req.params.query}":`, error);
-    res.status(500).json({ message: 'Error searching inventory items', error: error.message });
+    res.status(400).json({ message: error.message });
   }
 };

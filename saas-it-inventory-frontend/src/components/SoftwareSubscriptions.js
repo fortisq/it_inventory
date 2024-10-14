@@ -8,24 +8,27 @@ const SoftwareSubscriptions = () => {
     vendor: '',
     licenseType: '',
     expirationDate: '',
-    seats: 0
+    seats: 0,
+    status: 'active'
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchSubscriptions();
-  }, [currentPage, searchTerm]);
+  }, []);
 
   const fetchSubscriptions = async () => {
     try {
-      const response = await api.get(`/api/software-subscriptions?page=${currentPage}&limit=${itemsPerPage}&search=${searchTerm}`);
-      setSubscriptions(response.data.subscriptions);
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      console.error('Error fetching software subscriptions:', error);
+      setLoading(true);
+      const response = await api.get('/api/subscriptions');
+      setSubscriptions(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Error fetching subscriptions');
+      console.error('Error fetching subscriptions:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,45 +39,35 @@ const SoftwareSubscriptions = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/api/software-subscriptions', newSubscription);
+      await api.post('/api/subscriptions', newSubscription);
       setNewSubscription({
         name: '',
         vendor: '',
         licenseType: '',
         expirationDate: '',
-        seats: 0
+        seats: 0,
+        status: 'active'
       });
       fetchSubscriptions();
-    } catch (error) {
-      console.error('Error adding software subscription:', error);
+    } catch (err) {
+      setError('Error creating subscription');
+      console.error('Error creating subscription:', err);
     }
   };
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-  };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
       <h2>Software Subscriptions</h2>
-      <input
-        type="text"
-        placeholder="Search subscriptions..."
-        value={searchTerm}
-        onChange={handleSearch}
-      />
       <form onSubmit={handleSubmit}>
         <input
           type="text"
           name="name"
           value={newSubscription.name}
           onChange={handleInputChange}
-          placeholder="Software Name"
+          placeholder="Subscription Name"
           required
         />
         <input
@@ -108,6 +101,16 @@ const SoftwareSubscriptions = () => {
           placeholder="Number of Seats"
           required
         />
+        <select
+          name="status"
+          value={newSubscription.status}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="active">Active</option>
+          <option value="expired">Expired</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
         <button type="submit">Add Subscription</button>
       </form>
       <ul>
@@ -115,21 +118,10 @@ const SoftwareSubscriptions = () => {
           <li key={subscription._id}>
             {subscription.name} - {subscription.vendor} - {subscription.licenseType} - 
             Expires: {new Date(subscription.expirationDate).toLocaleDateString()} - 
-            Seats: {subscription.seats}
+            Seats: {subscription.seats} - Status: {subscription.status}
           </li>
         ))}
       </ul>
-      <div>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <button
-            key={page}
-            onClick={() => handlePageChange(page)}
-            disabled={currentPage === page}
-          >
-            {page}
-          </button>
-        ))}
-      </div>
     </div>
   );
 };
