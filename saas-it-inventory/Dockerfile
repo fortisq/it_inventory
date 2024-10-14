@@ -1,5 +1,5 @@
 # Build stage
-FROM node:16-alpine AS builder
+FROM node:18-alpine AS builder
 
 # Set the working directory
 WORKDIR /usr/src/app
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Production stage
-FROM node:16-alpine
+FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app

@@ -60,23 +60,24 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json({limit: '50mb'})); // Added body-parser
-app.use(express.urlencoded({limit: '50mb', extended: true})); // Added body-parser
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb', extended: true}));
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Logging middleware (only log route access, not body)
+// Logging middleware
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.url}`);
   next();
 });
 
 logger.info('Attempting to connect to MongoDB...');
+logger.info('MongoDB URI:', process.env.MONGODB_URI); // Log the MongoDB URI
+
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true,
 })
 .then(async () => {
   logger.info('Connected to MongoDB');
@@ -92,7 +93,10 @@ mongoose.connect(process.env.MONGODB_URI, {
   await configurationController.initializeDefaultConfigurations();
   logger.info('Default configurations initialized');
 })
-.catch((err) => logger.error('MongoDB connection error:', err));
+.catch((err) => {
+  logger.error('MongoDB connection error:', err);
+  process.exit(1); // Exit the process if unable to connect to MongoDB
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/inventory', inventoryRoutes);
@@ -117,10 +121,17 @@ app.use('/api/software-subscriptions', softwareSubscriptionRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   logger.error('Error:', err.message);
+  logger.error('Stack:', err.stack);
   res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   logger.info(`Server is running on port ${PORT}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Application specific logging, throwing an error, or other logic here
 });

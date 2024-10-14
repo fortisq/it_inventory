@@ -57,6 +57,7 @@
   "author": "Dan Bressers <dan@nitsolutions.ltd>",
   "license": "MIT",
   "resolutions": {
-    "chart.js": "^4.4.4"
+    "chart.js": "^4.4.4",
+    "react-chartjs-2": "^5.2.0"
   }
 }

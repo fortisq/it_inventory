@@ -135,6 +135,23 @@ install_mongodb() {
     sudo systemctl enable mongod
 }
 
+# Function to wait for backend to be healthy
+wait_for_backend() {
+    log "Waiting for backend to be healthy..."
+    local max_attempts=30
+    local attempt=1
+    while [ $attempt -le $max_attempts ]; do
+        if docker-compose exec backend node healthcheck.js; then
+            log "Backend is healthy"
+            return 0
+        fi
+        log "Backend not yet healthy. Attempt $attempt/$max_attempts"
+        sleep 10
+        attempt=$((attempt + 1))
+    done
+    error "Backend failed to become healthy after $max_attempts attempts"
+}
+
 # Main setup function
 main_setup() {
     # Check for updates
@@ -236,11 +253,7 @@ main_setup() {
     # Install frontend dependencies
     log "Installing frontend dependencies..."
     cd saas-it-inventory-frontend || error "Failed to navigate to frontend directory"
-    retry 3 npm install --legacy-peer-deps || error "Failed to install frontend dependencies"
-    
-    # Install additional frontend dependencies for PDFs, Excel, and charts
-    log "Installing additional frontend dependencies..."
-    retry 3 npm install --legacy-peer-deps chart.js@^4.4.4 file-saver xlsx jspdf jspdf-autotable || error "Failed to install additional frontend dependencies"
+    retry 3 npm install --legacy-peer-deps --force || error "Failed to install frontend dependencies"
     
     cd ..
 
@@ -255,12 +268,12 @@ main_setup() {
     JWT_SECRET=$(openssl rand -base64 32)
     ENCRYPTION_KEY=$(openssl rand -base64 32)
     cat << EOF > .env
-MONGODB_URI=mongodb://localhost:27017/it_inventory
+MONGODB_URI=mongodb://mongo:27017/it_inventory
 JWT_SECRET=$JWT_SECRET
 ENCRYPTION_KEY=$ENCRYPTION_KEY
 NODE_ENV=production
 PORT=3000
-REACT_APP_API_URL=http://localhost:3000
+REACT_APP_API_URL=http://localhost:3000/api
 EOF
     log "Environment variables configured"
 
@@ -279,6 +292,9 @@ EOF
 
     log "Waiting for services to start..."
     sleep 30
+
+    # Wait for backend to be healthy
+    wait_for_backend
 
     # Check container status
     log "Checking container status..."
@@ -306,8 +322,8 @@ EOF
 
     log "Setup and configuration complete. Your IT Inventory Application is now running!"
     log "Access the application:"
-    log "- Local: http://localhost:3000"
-    log "- Network: http://$IP_ADDRESS:3000"
+    log "- Local: http://localhost"
+    log "- Network: http://$IP_ADDRESS"
     log "Login with the following credentials:"
     log "- Username: root"
     log "- Password: root"
