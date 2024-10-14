@@ -17,6 +17,7 @@
 14. [License](#license)
 15. [Support](#support)
 16. [Additional Information](#additional-information)
+17. [Recent Updates](#recent-updates)
 
 ## Overview
 
@@ -33,6 +34,7 @@ IT Inventory is a comprehensive solution designed to help organizations efficien
 - Data Visualization: Visualize inventory data, asset distribution, and trends using interactive charts.
 - Pagination: Efficiently navigate through large datasets in inventory, assets, and software subscriptions lists.
 - Search Functionality: Quickly find specific items in inventory, assets, and software subscriptions.
+- PDF and Excel Export: Generate and download reports in PDF and Excel formats.
 
 ## System Requirements
 
@@ -63,18 +65,28 @@ IT Inventory is a comprehensive solution designed to help organizations efficien
    ```
 
    This script will:
+   - Check for sufficient disk space (minimum 5GB required)
    - Check and install system dependencies
-   - Install Docker and Docker Compose if not already present
+   - Install Docker (version 20.10.0 or higher) and Docker Compose (version 1.29.2 or higher) if not already present
    - Set up the necessary environment variables
    - Build and start the Docker containers
    - Create a super admin account
    - Optionally seed the database with initial data
+   - Install additional frontend dependencies for PDF generation, Excel export, and charting
 
-3. After the script completes, you can access the application:
-   - Locally: http://localhost
-   - Network: http://<your-ip-address>
+   The script includes progress indicators for long-running operations and improved error handling.
+
+3. During the setup process:
+   - If you're not in the docker group, the script will add you and prompt you to log out and log back in.
+   - You'll be asked if you want to seed the database with initial data. This is recommended for new installations.
+
+4. After the script completes, you can access the application:
+   - Locally: http://localhost:3000
+   - Network: http://<your-ip-address>:3000
 
 Note: The setup script automatically generates secure values for JWT_SECRET and ENCRYPTION_KEY environment variables. These are used in the docker-compose.yml file for enhanced security.
+
+If the setup process is interrupted or fails, you can safely run the script again. It includes cleanup procedures to ensure a fresh start.
 
 ## Usage
 
@@ -161,3 +173,36 @@ For more detailed information about specific components and usage instructions, 
 - [Changelog](CHANGELOG.md)
 - [Security Policy](SECURITY.md)
 - [FAQ](FAQ.md)
+
+## Recent Updates
+
+The setup process has been updated to include additional dependencies for generating PDFs, Excel documents, and charts. The following changes have been made:
+
+1. Added installation of frontend dependencies:
+   - chart.js (version 3.0.0 or higher)
+   - file-saver
+   - xlsx
+   - jspdf
+   - jspdf-autotable
+
+2. Updated the test_setup.ps1 script to verify the presence of these new dependencies.
+
+### Testing the Updated Setup
+
+To test the updated setup process:
+
+1. Run the setup script:
+   ```
+   ./setup.sh
+   ```
+
+2. After the setup is complete, run the test script:
+   ```
+   powershell -ExecutionPolicy Bypass -File test_setup.ps1
+   ```
+
+3. Verify that all tests pass successfully, including checks for the new dependencies.
+
+4. Access the application and test the functionality related to generating reports, charts, and exporting data to ensure the new dependencies are working correctly.
+
+If you encounter any issues during the setup or testing process, please refer to the troubleshooting section in this README or contact the development team for assistance.

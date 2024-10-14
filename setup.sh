@@ -20,6 +20,8 @@ cleanup() {
     if [ "$?" -ne 0 ]; then
         log "An error occurred. Cleaning up..."
         docker-compose down --remove-orphans
+        rm -f .env saas-it-inventory-frontend/.env
+        log "Cleanup complete. Please run the script again."
     fi
 }
 
@@ -87,6 +89,41 @@ check_docker_daemon() {
     fi
 }
 
+# Function to check available disk space
+check_disk_space() {
+    local required_space=5000000  # 5GB in KB
+    local available_space=$(df . | awk 'NR==2 {print $4}')
+    if [ $available_space -lt $required_space ]; then
+        error "Not enough disk space. At least 5GB is required."
+    fi
+}
+
+# Function to show progress
+show_progress() {
+    local pid=$1
+    local delay=0.75
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
+# Function to install MongoDB
+install_mongodb() {
+    log "Installing MongoDB..."
+    wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+    sudo apt-get update
+    sudo apt-get install -y mongodb-org
+    sudo systemctl start mongod
+    sudo systemctl enable mongod
+}
+
 # Main setup function
 main_setup() {
     # Check if running as root
@@ -94,8 +131,14 @@ main_setup() {
         error "This script should not be run as root. Please run as a normal user."
     fi
 
+    # Check available disk space
+    check_disk_space
+
     # Install system dependencies
     install_system_dependencies
+
+    # Install MongoDB
+    install_mongodb
 
     # Check if user is in docker group
     if ! groups | grep -q docker; then
@@ -139,7 +182,9 @@ main_setup() {
     else
         log "Docker is already installed. Checking version..."
         docker_version=$(docker --version | awk '{print $3}' | cut -d',' -f1)
-        if [[ "$docker_version" < "20.10.0" ]]; then
+        if version_ge "$docker_version" "20.10.0"; then
+            log "Docker version is 20.10.0 or higher. Proceeding with installation."
+        else
             error "Docker version 20.10.0 or higher is required. Current version: $docker_version"
         fi
     fi
@@ -152,7 +197,9 @@ main_setup() {
     else
         log "Docker Compose is already installed. Checking version..."
         compose_version=$(docker-compose --version | awk '{print $3}' | cut -d',' -f1)
-        if [[ "$compose_version" < "1.29.2" ]]; then
+        if version_ge "$compose_version" "1.29.2"; then
+            log "Docker Compose version is 1.29.2 or higher. Proceeding with installation."
+        else
             error "Docker Compose version 1.29.2 or higher is required. Current version: $compose_version"
         fi
     fi
@@ -172,6 +219,11 @@ main_setup() {
     log "Installing frontend dependencies..."
     cd saas-it-inventory-frontend || error "Failed to navigate to frontend directory"
     retry 3 npm install || error "Failed to install frontend dependencies"
+    
+    # Install additional frontend dependencies for PDFs, Excel, and charts
+    log "Installing additional frontend dependencies..."
+    retry 3 npm install chart.js@^3.0.0 file-saver xlsx jspdf jspdf-autotable || error "Failed to install additional frontend dependencies"
+    
     cd ..
 
     # Install backend dependencies
@@ -185,11 +237,12 @@ main_setup() {
     JWT_SECRET=$(openssl rand -base64 32)
     ENCRYPTION_KEY=$(openssl rand -base64 32)
     cat << EOF > .env
-MONGODB_URI=mongodb://mongo:27017/it_inventory
+MONGODB_URI=mongodb://localhost:27017/it_inventory
 JWT_SECRET=$JWT_SECRET
 ENCRYPTION_KEY=$ENCRYPTION_KEY
 NODE_ENV=production
 PORT=3000
+REACT_APP_API_URL=http://localhost:3000
 EOF
     log "Environment variables configured"
 
@@ -213,6 +266,11 @@ EOF
     log "Checking container status..."
     docker-compose ps
 
+    # Check if containers are running
+    if [ $(docker-compose ps -q | wc -l) -eq 0 ]; then
+        error "No containers are running. Please check the Docker logs for more information."
+    fi
+
     # Run the initialization script to create the super admin
     log "Creating super admin..."
     retry 3 docker-compose exec -T backend node scripts/init.js || error "Failed to create super admin"
@@ -230,8 +288,8 @@ EOF
 
     log "Setup and configuration complete. Your IT Inventory Application is now running!"
     log "Access the application:"
-    log "- Local: http://localhost"
-    log "- Network: http://$IP_ADDRESS"
+    log "- Local: http://localhost:3000"
+    log "- Network: http://$IP_ADDRESS:3000"
     log "Login with the following credentials:"
     log "- Username: root"
     log "- Password: root"
