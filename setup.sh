@@ -151,6 +151,14 @@ main_setup() {
     # Install system dependencies
     install_system_dependencies
 
+    # Run MongoDB setup script
+    log "Running MongoDB setup script..."
+    if [ -f "mongodb_setup.sh" ]; then
+        bash mongodb_setup.sh || error "Failed to run MongoDB setup script"
+    else
+        error "MongoDB setup script not found. Please ensure mongodb_setup.sh is in the same directory as setup.sh"
+    fi
+
     # Install MongoDB
     install_mongodb
 
