@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const inventoryController = require('../controllers/inventoryController');
-const { authMiddleware } = require('../middleware/authMiddleware');
+const authMiddleware = require('../middleware/authMiddleware');
 
+// Apply authMiddleware to all routes in this file
 router.use(authMiddleware);
 
 router.get('/', inventoryController.getInventory);

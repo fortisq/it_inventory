@@ -35,12 +35,20 @@ const formatDataForExcel = (data) => {
       { Section: 'Subscriptions by Vendor' },
       ...Object.entries(data.subscriptions.subscriptionsByVendor).map(([vendor, count]) => ({ Vendor: vendor, Count: count })),
       { Section: 'Subscription Duration Distribution' },
-      ...data.subscriptions.subscriptionDurationDistribution.map(item => ({
-        Duration: item.duration,
-        Count: item.count,
-        'Total Cost': `$${item.totalCost.toFixed(2)}`,
-        'Total Licenses': item.totalLicenses
-      }))
+      ...(Array.isArray(data.subscriptions.subscriptionDurationDistribution) 
+        ? data.subscriptions.subscriptionDurationDistribution.map(item => ({
+            Duration: item.duration,
+            Count: item.count,
+            'Total Cost': `$${item.totalCost.toFixed(2)}`,
+            'Total Licenses': item.totalLicenses
+          }))
+        : Object.entries(data.subscriptions.subscriptionDurationDistribution || {}).map(([duration, details]) => ({
+            Duration: duration,
+            Count: details.count,
+            'Total Cost': `$${details.totalCost.toFixed(2)}`,
+            'Total Licenses': details.totalLicenses
+          }))
+      )
     );
   }
 
@@ -86,6 +94,7 @@ export const downloadAllReports = (data) => {
 };
 
 export const downloadPDFReport = async (data) => {
+  console.log('Starting PDF generation', data);
   const pdf = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
@@ -104,13 +113,13 @@ export const downloadPDFReport = async (data) => {
   };
 
   const addSection = async (title, tableData, pieChartData, barChartData) => {
-    addPageIfNeeded(80);
+    console.log(`Adding section: ${title}`, { tableData, pieChartData, barChartData });
+    addPageIfNeeded(100);
 
     pdf.setFontSize(14);
     pdf.text(title, margin, yOffset);
     yOffset += 8;
 
-    // Add table
     pdf.setFontSize(8);
     pdf.autoTable({
       startY: yOffset,
@@ -124,16 +133,19 @@ export const downloadPDFReport = async (data) => {
     });
     yOffset = pdf.lastAutoTable.finalY + 5;
 
-    // Add charts side by side
     const chartWidth = (pageWidth - 3 * margin) / 2;
-    const chartHeight = 50;
+    const chartHeight = 60;
 
     try {
+      console.log('Generating pie chart');
       const pieChartUrl = await generateChartPNG(...pieChartData, 300, 150);
+      console.log('Pie chart generated');
       pdf.addImage(pieChartUrl, 'PNG', margin, yOffset, chartWidth, chartHeight);
       URL.revokeObjectURL(pieChartUrl);
 
+      console.log('Generating bar chart');
       const barChartUrl = await generateChartPNG(...barChartData, 300, 150);
+      console.log('Bar chart generated');
       pdf.addImage(barChartUrl, 'PNG', margin * 2 + chartWidth, yOffset, chartWidth, chartHeight);
       URL.revokeObjectURL(barChartUrl);
 
@@ -141,108 +153,106 @@ export const downloadPDFReport = async (data) => {
     } catch (error) {
       console.error('Error generating charts:', error);
       pdf.setTextColor(255, 0, 0);
-      pdf.text('Error generating charts', margin, yOffset);
+      pdf.text('Error generating charts: ' + error.message, margin, yOffset);
       pdf.setTextColor(0, 0, 0);
       yOffset += 10;
     }
   };
 
-  pdf.setFontSize(16);
-  pdf.text('Comprehensive IT Inventory Report', margin, yOffset);
-  yOffset += 8;
-  pdf.setFontSize(10);
-  pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, yOffset);
-  yOffset += 10;
+  try {
+    pdf.setFontSize(16);
+    pdf.text('Comprehensive IT Inventory Report', margin, yOffset);
+    yOffset += 8;
+    pdf.setFontSize(10);
+    pdf.text(`Generated on: ${new Date().toLocaleString()}`, margin, yOffset);
+    yOffset += 10;
 
-  if (data.assets) {
-    const assetTableData = [
-      { Metric: 'Total Assets', Value: data.assets.totalAssets },
-      { Metric: 'Total Asset Value', Value: `$${data.assets.totalAssetValue.toFixed(2)}` },
-      { Metric: 'Assets Needing Maintenance', Value: data.assets.assetsNeedingMaintenance },
-      { Metric: 'Average Asset Age', Value: `${calculateAverageAssetAge(data.assets.assetAgeDistribution).toFixed(2)} years` },
-    ];
-    await addSection('Asset Summary', assetTableData, 
-      ['pie', Object.keys(data.assets.assetsByStatus), [{
-        data: Object.values(data.assets.assetsByStatus),
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-      }]],
-      ['bar', Object.keys(data.assets.assetsByType), [{
-        label: 'Assets by Type',
-        data: Object.values(data.assets.assetsByType),
-        backgroundColor: '#36A2EB',
-      }]]
-    );
+    if (data.assets) {
+      console.log('Processing asset data');
+      const assetTableData = [
+        { Metric: 'Total Assets', Value: data.assets.totalAssets },
+        { Metric: 'Total Asset Value', Value: `$${data.assets.totalAssetValue.toFixed(2)}` },
+        { Metric: 'Assets Needing Maintenance', Value: data.assets.assetsNeedingMaintenance },
+        { Metric: 'Average Asset Age', Value: `${calculateAverageAssetAge(data.assets.assetAgeDistribution).toFixed(2)} years` },
+      ];
+      await addSection('Asset Summary', assetTableData, 
+        ['pie', Object.keys(data.assets.assetsByStatus), [{
+          data: Object.values(data.assets.assetsByStatus),
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        }]],
+        ['bar', Object.keys(data.assets.assetsByType), [{
+          label: 'Assets by Type',
+          data: Object.values(data.assets.assetsByType),
+          backgroundColor: '#36A2EB',
+        }]]
+      );
+    }
+
+    if (data.subscriptions) {
+      console.log('Processing subscription data');
+      const subscriptionTableData = [
+        { Metric: 'Total Subscriptions', Value: data.subscriptions.totalSubscriptions },
+        { Metric: 'Total Seats', Value: data.subscriptions.totalSeats },
+        { Metric: 'Total Cost', Value: `$${data.subscriptions.totalCost.toFixed(2)}` },
+        { Metric: 'Expiring Soon', Value: data.subscriptions.expiringSoon },
+        { Metric: 'Average Cost per Seat', Value: `$${(data.subscriptions.totalCost / data.subscriptions.totalSeats).toFixed(2)}` },
+      ];
+
+      const subscriptionDurationData = Array.isArray(data.subscriptions.subscriptionDurationDistribution)
+        ? data.subscriptions.subscriptionDurationDistribution
+        : Object.entries(data.subscriptions.subscriptionDurationDistribution || {}).map(([duration, details]) => ({
+            duration,
+            count: details.count,
+            totalCost: details.totalCost,
+            totalLicenses: details.totalLicenses
+          }));
+
+      await addSection('Subscription Summary', subscriptionTableData,
+        ['pie', Object.keys(data.subscriptions.subscriptionsByVendor), [{
+          data: Object.values(data.subscriptions.subscriptionsByVendor),
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        }]],
+        ['bar', subscriptionDurationData.map(item => item.duration), [{
+          label: 'Number of Subscriptions',
+          data: subscriptionDurationData.map(item => item.count),
+          backgroundColor: '#FF6384',
+        }]]
+      );
+    }
+
+    if (data.inventory) {
+      console.log('Processing inventory data');
+      const inventoryTableData = [
+        { Metric: 'Total Items', Value: data.inventory.totalItems },
+        { Metric: 'Total Value', Value: `$${data.inventory.totalValue.toFixed(2)}` },
+        { Metric: 'Low Stock Items', Value: data.inventory.lowStockItems },
+        { Metric: 'Average Turnover Rate', Value: data.inventory.averageTurnoverRate.toFixed(2) },
+        { Metric: 'Average Value per Item', Value: `$${(data.inventory.totalValue / data.inventory.totalItems).toFixed(2)}` },
+      ];
+      await addSection('Inventory Summary', inventoryTableData,
+        ['pie', Object.keys(data.inventory.itemsByCategory), [{
+          data: Object.values(data.inventory.itemsByCategory),
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        }]],
+        ['bar', Object.keys(data.inventory.itemsByLocation), [{
+          label: 'Items by Location',
+          data: Object.values(data.inventory.itemsByLocation),
+          backgroundColor: '#FFCE56',
+        }]]
+      );
+    }
+
+    console.log('Saving PDF');
+    pdf.save('comprehensive_it_inventory_report.pdf');
+    console.log('PDF saved successfully');
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
   }
-
-  if (data.subscriptions) {
-    const subscriptionTableData = [
-      { Metric: 'Total Subscriptions', Value: data.subscriptions.totalSubscriptions },
-      { Metric: 'Total Seats', Value: data.subscriptions.totalSeats },
-      { Metric: 'Total Cost', Value: `$${data.subscriptions.totalCost.toFixed(2)}` },
-      { Metric: 'Expiring Soon', Value: data.subscriptions.expiringSoon },
-      { Metric: 'Average Cost per Seat', Value: `$${(data.subscriptions.totalCost / data.subscriptions.totalSeats).toFixed(2)}` },
-    ];
-    await addSection('Subscription Summary', subscriptionTableData,
-      ['pie', Object.keys(data.subscriptions.subscriptionsByVendor), [{
-        data: Object.values(data.subscriptions.subscriptionsByVendor),
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-      }]],
-      ['bar', data.subscriptions.subscriptionDurationDistribution.map(item => item.duration), [{
-        label: 'Number of Subscriptions',
-        data: data.subscriptions.subscriptionDurationDistribution.map(item => item.count),
-        backgroundColor: '#FF6384',
-      }]]
-    );
-  }
-
-  if (data.inventory) {
-    const inventoryTableData = [
-      { Metric: 'Total Items', Value: data.inventory.totalItems },
-      { Metric: 'Total Value', Value: `$${data.inventory.totalValue.toFixed(2)}` },
-      { Metric: 'Low Stock Items', Value: data.inventory.lowStockItems },
-      { Metric: 'Average Turnover Rate', Value: data.inventory.averageTurnoverRate.toFixed(2) },
-      { Metric: 'Average Value per Item', Value: `$${(data.inventory.totalValue / data.inventory.totalItems).toFixed(2)}` },
-    ];
-    await addSection('Inventory Summary', inventoryTableData,
-      ['pie', Object.keys(data.inventory.itemsByCategory), [{
-        data: Object.values(data.inventory.itemsByCategory),
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-      }]],
-      ['bar', Object.keys(data.inventory.itemsByLocation), [{
-        label: 'Items by Location',
-        data: Object.values(data.inventory.itemsByLocation),
-        backgroundColor: '#FFCE56',
-      }]]
-    );
-  }
-
-  pdf.save('comprehensive_it_inventory_report.pdf');
 };
 
 function calculateAverageAssetAge(ageDistribution) {
   const totalAssets = Object.values(ageDistribution).reduce((sum, count) => sum + count, 0);
   const weightedSum = Object.entries(ageDistribution).reduce((sum, [age, count]) => sum + (Number(age) * count), 0);
   return totalAssets > 0 ? weightedSum / totalAssets : 0;
-}
-
-function getMostCommonItem(itemCounts) {
-  return Object.entries(itemCounts).reduce((a, b) => a[1] > b[1] ? a : b, ['N/A', 0])[0];
-}
-
-function calculateAverageSubscriptionDuration(durationDistribution) {
-  const totalSubscriptions = durationDistribution.reduce((sum, item) => sum + item.count, 0);
-  const weightedSum = durationDistribution.reduce((sum, item) => sum + (parseDuration(item.duration) * item.count), 0);
-  return totalSubscriptions > 0 ? weightedSum / totalSubscriptions : 0;
-}
-
-function parseDuration(duration) {
-  return parseInt(duration.split(' ')[0], 10);
-}
-
-function calculateInventoryValueDistribution(itemsByCategory, totalValue) {
-  if (totalValue === 0) return 'N/A (Total value is 0)';
-  const distribution = Object.entries(itemsByCategory)
-    .map(([category, count]) => `${category}: ${((count / totalValue) * 100).toFixed(2)}%`)
-    .join(', ');
-  return distribution || 'N/A';
 }

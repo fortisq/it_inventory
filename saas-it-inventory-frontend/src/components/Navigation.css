@@ -1,9 +1,10 @@
-.navigation {
-  background-color: #2c3e50;
-  padding: 0.5rem 1rem;
+.navbar {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  padding: 1rem;
 }
 
-.nav-container {
+.navbar-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -11,131 +12,147 @@
   margin: 0 auto;
 }
 
-.nav-logo {
-  color: #ecf0f1;
+.navbar-brand {
+  margin-right: 2rem;
+  white-space: nowrap;
+}
+
+.navbar-brand a {
   font-size: 1.5rem;
   font-weight: bold;
+  color: #333;
+  text-decoration: none;
 }
 
-.nav-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: #ecf0f1;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.nav-menu {
+.navbar-nav {
   display: flex;
+  flex-wrap: nowrap;
   list-style-type: none;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
-.nav-menu li {
+.nav-item {
   margin-left: 1rem;
+  white-space: nowrap;
 }
 
-.nav-menu a {
-  color: #ecf0f1;
-  text-decoration: none;
+.nav-item a, .nav-item button {
   display: flex;
   align-items: center;
-  padding: 0.5rem;
-  transition: color 0.3s ease;
+  color: #333;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
-.nav-menu a:hover, .nav-menu a.active {
-  color: #3498db;
+.nav-item a:hover, .nav-item button:hover {
+  background-color: #e9ecef;
+  color: #007bff;
 }
 
-.nav-menu a svg {
+.btn-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font: inherit;
+}
+
+.nav-item svg {
   margin-right: 0.5rem;
 }
 
-.dropdown {
+.user-dropdown {
   position: relative;
 }
 
-.dropbtn {
+.dropdown-toggle {
   background: none;
   border: none;
-  color: #ecf0f1;
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+  padding: 0.5rem 1rem;
 }
 
-.dropdown-content {
-  display: none;
+.dropdown-toggle svg {
+  margin-right: 0.5rem;
+}
+
+.dropdown-toggle .user-name {
+  margin-right: 0.5rem;
+}
+
+.dropdown-menu {
   position: absolute;
+  top: 100%;
   right: 0;
-  background-color: #34495e;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+  background-color: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  list-style-type: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  min-width: 150px;
+  z-index: 1000;
 }
 
-.dropdown-content a, .dropdown-content button {
-  color: #ecf0f1;
-  padding: 12px 16px;
-  text-decoration: none;
+.dropdown-menu li {
+  padding: 0;
+}
+
+.dropdown-menu a,
+.dropdown-menu button {
   display: block;
-  text-align: left;
   width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  color: #333;
+  text-decoration: none;
   background: none;
   border: none;
+  font-size: 1rem;
   cursor: pointer;
 }
 
-.dropdown-content a:hover, .dropdown-content button:hover {
-  background-color: #2c3e50;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+  background-color: #e9ecef;
 }
 
 @media (max-width: 768px) {
-  .nav-toggle {
-    display: block;
-  }
-
-  .nav-menu {
-    display: none;
+  .navbar-content {
     flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #2c3e50;
+    align-items: flex-start;
   }
 
-  .nav-menu.open {
-    display: flex;
+  .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
   }
 
-  .nav-menu li {
-    margin: 0;
+  .nav-item {
+    margin-left: 0;
+    margin-bottom: 0.5rem;
   }
 
-  .nav-menu a {
-    padding: 1rem;
+  .user-dropdown {
+    width: 100%;
   }
 
-  .dropdown-content {
+  .dropdown-menu {
     position: static;
-    display: none;
-    background-color: #34495e;
-  }
-
-  .dropdown:hover .dropdown-content {
-    display: none;
-  }
-
-  .dropdown.open .dropdown-content {
-    display: block;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    background-color: #f8f9fa;
   }
 }

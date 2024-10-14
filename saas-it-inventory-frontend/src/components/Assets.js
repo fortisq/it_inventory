@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import './Assets.css';
 import AssetSearchBar from './AssetSearchBar';
+import { useConfiguration } from '../context/ConfigurationContext';
 
 const Assets = () => {
+  const { configurations } = useConfiguration();
   const [assets, setAssets] = useState([]);
   const [newAsset, setNewAsset] = useState({
     name: '',
@@ -23,11 +25,17 @@ const Assets = () => {
   const [originalEditingAsset, setOriginalEditingAsset] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('name');
+
+  useEffect(() => {
+    if (configurations.items_per_page) {
+      setItemsPerPage(parseInt(configurations.items_per_page, 10));
+    }
+  }, [configurations.items_per_page]);
 
   const statusOptions = [
     { value: 'available', label: 'Available' },
@@ -169,7 +177,7 @@ const Assets = () => {
 
   return (
     <div className="assets">
-      <h1 className="assets-title">Asset Tracking</h1>
+      <h1 className="assets-title">{configurations.assets_page_title || 'Asset Tracking'}</h1>
       {error && <div className="assets-error">{error}</div>}
       <AssetSearchBar onSearch={handleSearch} />
       <form onSubmit={handleSubmit} className="assets-form">
@@ -253,8 +261,8 @@ const Assets = () => {
         <h2>Current Assets</h2>
         {assets.length > 0 ? (
           <>
-            <table className="assets-table">
-              <thead>
+            <table className="assets-table" style={{ backgroundColor: configurations.assets_table_color || '#ffffff' }}>
+              <thead style={{ backgroundColor: configurations.assets_table_header_color || '#f8f9fa' }}>
                 <tr>
                   <th>Name</th>
                   <th>Type</th>
@@ -268,8 +276,8 @@ const Assets = () => {
                 </tr>
               </thead>
               <tbody>
-                {assets.map((asset) => (
-                  <tr key={asset._id}>
+                {assets.map((asset, index) => (
+                  <tr key={asset._id} style={{ backgroundColor: index % 2 === 0 ? configurations.assets_table_row_color || '#ffffff' : '#f8f9fa' }}>
                     <td>{asset.name}</td>
                     <td>{asset.type}</td>
                     <td>{asset.location}</td>

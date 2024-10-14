@@ -50,13 +50,13 @@ const Reports = () => {
       setDownloadStatus('Generating report...');
       if (reportType === 'all') {
         if (format === 'excel') {
-          downloadAllReports(reportData);
+          await downloadAllReports(reportData);
         } else {
           await downloadPDFReport(reportData);
         }
       } else {
         if (format === 'excel') {
-          downloadReport(reportData[reportType], reportType);
+          await downloadReport(reportData[reportType], reportType);
         } else {
           await downloadPDFReport({ [reportType]: reportData[reportType] });
         }
@@ -64,9 +64,17 @@ const Reports = () => {
       setDownloadStatus('Report downloaded successfully!');
     } catch (error) {
       console.error('Error downloading report:', error);
-      setDownloadStatus(`Failed to download report: ${error.message}`);
+      let errorMessage = 'Failed to download report. ';
+      if (error.message) {
+        errorMessage += error.message;
+      } else if (error.response && error.response.data && error.response.data.message) {
+        errorMessage += error.response.data.message;
+      } else {
+        errorMessage += 'An unexpected error occurred.';
+      }
+      setDownloadStatus(errorMessage);
     } finally {
-      setTimeout(() => setDownloadStatus(null), 3000);
+      setTimeout(() => setDownloadStatus(null), 5000);
     }
   };
 
@@ -180,22 +188,26 @@ const ReportSection = React.memo(({ title, reportType, data, chartData, barChart
     <div className="report-content">
       <div className="report-grid">
         {Object.entries(data || {}).map(([key, value]) => {
-          if (key !== 'assetsByStatus' && key !== 'assetsByType' && key !== 'subscriptionsByVendor' && key !== 'itemsByCategory' && key !== 'itemsByLocation') {
+          if (key !== 'assetsByStatus' && key !== 'assetsByType' && key !== 'subscriptionsByVendor' && key !== 'itemsByCategory' && key !== 'itemsByLocation' && key !== 'subscriptionDurationDistribution') {
             return (
               <div key={key} className="report-item">
                 <h3>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h3>
                 <p className="report-number">
-                  {typeof value === 'number' 
-                    ? value.toFixed(2) 
-                    : typeof value === 'object' 
-                      ? JSON.stringify(value)
-                      : value}
+                  {formatReportValue(key, value)}
                 </p>
               </div>
             );
           }
           return null;
         })}
+        {reportType === 'subscriptions' && data.subscriptionsByVendor && (
+          <div className="report-item">
+            <h3>Top Vendors</h3>
+            <p className="report-number">
+              {formatTopVendors(data.subscriptionsByVendor)}
+            </p>
+          </div>
+        )}
       </div>
       <div className="chart-grid">
         {chartData && chartData.datasets && chartData.datasets[0] && (
@@ -215,8 +227,39 @@ const ReportSection = React.memo(({ title, reportType, data, chartData, barChart
           </div>
         )}
       </div>
+      {reportType === 'subscriptions' && data.subscriptionDurationDistribution && (
+        <div className="subscription-duration-distribution">
+          <h3>Subscription Duration Distribution</h3>
+          <ul>
+            {Object.entries(data.subscriptionDurationDistribution).map(([duration, details]) => (
+              <li key={duration}>
+                {duration}: Count - {details.count}, Total Cost - ${details.totalCost.toFixed(2)}, Total Licenses - {details.totalLicenses}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   </div>
 ));
+
+const formatReportValue = (key, value) => {
+  if (typeof value === 'number') {
+    return value.toFixed(2);
+  }
+  if (key === 'assetAgeDistribution' && typeof value === 'object') {
+    return Object.entries(value)
+      .map(([age, count]) => `${age} year${age !== '1' ? 's' : ''}: ${count}`)
+      .join(', ');
+  }
+  return value;
+};
+
+const formatTopVendors = (subscriptionsByVendor) => {
+  const sortedVendors = Object.entries(subscriptionsByVendor)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+  return sortedVendors.map(([vendor, count]) => `${vendor}: ${count}`).join(', ');
+};
 
 export default Reports;

@@ -1,72 +1,88 @@
-import React, { useContext, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { FaHome, FaBoxes, FaLaptop, FaFileAlt, FaChartBar, FaUsers, FaUserCircle, FaQuestionCircle, FaSignOutAlt, FaCog, FaBars } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useConfiguration } from '../context/ConfigurationContext';
 import './Navigation.css';
+import { FaBox, FaClipboardList, FaFileInvoiceDollar, FaChartBar, FaUsers, FaCog, FaUser, FaSignOutAlt, FaCaretDown } from 'react-icons/fa';
 
 const Navigation = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout } = useAuth();
+  const { getConfigValue, getNavLinks } = useConfiguration();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleLogout = (e) => {
-    e.preventDefault();
+  const applicationTitle = getConfigValue('application_title', 'IT Inventory');
+  const navLinks = getNavLinks();
+
+  const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  if (!user) return null;
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
 
-  const NavItem = ({ to, icon, children }) => (
-    <li>
-      <NavLink to={to} className={({ isActive }) => isActive ? "active" : ""} onClick={() => setIsMenuOpen(false)}>
-        {icon}
-        <span>{children}</span>
-      </NavLink>
-    </li>
-  );
+  // Hide navigation on login page
+  if (location.pathname === '/login') {
+    return null;
+  }
+
+  const getIcon = (name) => {
+    switch (name.toLowerCase()) {
+      case 'assets': return <FaBox />;
+      case 'inventory': return <FaClipboardList />;
+      case 'subscriptions': return <FaFileInvoiceDollar />;
+      case 'reports': return <FaChartBar />;
+      case 'user management': return <FaUsers />;
+      case 'configuration': return <FaCog />;
+      default: return null;
+    }
+  };
 
   return (
-    <nav className="navigation">
-      <div className="nav-container">
-        <div className="nav-logo">IT Inventory</div>
-        <button className="nav-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation">
-          <FaBars />
-        </button>
-        <ul className={`nav-menu ${isMenuOpen ? 'open' : ''}`}>
-          <NavItem to="/dashboard" icon={<FaHome />}>Dashboard</NavItem>
-          <NavItem to="/inventory" icon={<FaBoxes />}>Inventory</NavItem>
-          <NavItem to="/assets" icon={<FaLaptop />}>Assets</NavItem>
-          <NavItem to="/subscriptions" icon={<FaFileAlt />}>Subscriptions</NavItem>
-          <NavItem to="/reports" icon={<FaChartBar />}>Reports</NavItem>
-          <NavItem to="/data-visualization" icon={<FaChartBar />}>Data Visualization</NavItem>
-          {user.role === 'admin' && (
-            <>
-              <NavItem to="/user-management" icon={<FaUsers />}>User Management</NavItem>
-              <NavItem to="/configuration-management" icon={<FaCog />}>Configuration Management</NavItem>
-            </>
-          )}
-          <li className="dropdown">
-            <button className="dropbtn">
-              <FaUserCircle />
-              <span>{user.username}</span>
-            </button>
-            <div className="dropdown-content">
-              <NavLink to="/profile" onClick={() => setIsMenuOpen(false)}>
-                <FaUserCircle />
-                <span>Profile</span>
-              </NavLink>
-              <NavLink to="/help-support" onClick={() => setIsMenuOpen(false)}>
-                <FaQuestionCircle />
-                <span>Help & Support</span>
-              </NavLink>
-              <button onClick={handleLogout} className="logout-button">
-                <FaSignOutAlt />
-                <span>Logout</span>
+    <nav className="navbar">
+      <div className="navbar-content">
+        <div className="navbar-brand">
+          <Link to="/">{applicationTitle}</Link>
+        </div>
+        {user && (
+          <ul className="navbar-nav">
+            {navLinks.map((link) => (
+              <li key={link.path} className="nav-item">
+                <Link to={link.path}>
+                  {getIcon(link.name)} {link.name}
+                </Link>
+              </li>
+            ))}
+            {user.role === 'admin' && (
+              <>
+                <li className="nav-item">
+                  <Link to="/users"><FaUsers /> User Management</Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/configuration"><FaCog /> Configuration</Link>
+                </li>
+              </>
+            )}
+            <li className="nav-item user-dropdown">
+              <button onClick={toggleDropdown} className="dropdown-toggle">
+                <FaUser /> <span className="user-name">{user.name}</span> <FaCaretDown />
               </button>
-            </div>
-          </li>
-        </ul>
+              {dropdownOpen && (
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link to="/profile"><FaUser /> Profile</Link>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout}><FaSignOutAlt /> Logout</button>
+                  </li>
+                </ul>
+              )}
+            </li>
+          </ul>
+        )}
       </div>
     </nav>
   );

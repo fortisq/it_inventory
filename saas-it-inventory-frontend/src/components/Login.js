@@ -1,34 +1,29 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
-  };
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    console.log('Attempting login with:', credentials);
-    const success = await login(credentials);
-    console.log('Login success:', success);
-    if (success) {
-      navigate('/dashboard');
-    } else {
-      setError('Login failed. Please check your credentials.');
+    try {
+      await login(username, password);
+      navigate('/');
+    } catch (err) {
+      setError('Invalid username or password');
     }
   };
 
   return (
     <div className="login-container">
-      <form className="login-form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="login-form">
         <h2>Login</h2>
         {error && <div className="error-message">{error}</div>}
         <div className="form-group">
@@ -36,9 +31,8 @@ const Login = () => {
           <input
             type="text"
             id="username"
-            name="username"
-            value={credentials.username}
-            onChange={handleChange}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
@@ -47,13 +41,12 @@ const Login = () => {
           <input
             type="password"
             id="password"
-            name="password"
-            value={credentials.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <button type="submit" className="login-button">Login</button>
+        <button type="submit" className="btn btn-primary">Login</button>
       </form>
     </div>
   );

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../services/api';
 import './Inventory.css';
 import SearchBar from './SearchBar';
+import { useConfiguration } from '../context/ConfigurationContext';
 
 const Inventory = () => {
+  const { configurations } = useConfiguration();
   const [inventory, setInventory] = useState([]);
   const [newItem, setNewItem] = useState({
     name: '',
@@ -187,7 +189,7 @@ const Inventory = () => {
 
   return (
     <div className="inventory">
-      <h1 className="inventory-title">Inventory Management</h1>
+      <h1 className="inventory-title">{configurations.inventory_page_title || 'Inventory Management'}</h1>
       {error && <div className="inventory-error">{error}</div>}
       <SearchBar onSearch={handleSearch} />
       <form onSubmit={handleSubmit} className="inventory-form">

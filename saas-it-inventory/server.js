@@ -14,6 +14,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const assetRoutes = require('./routes/assetRoutes');
 const softwareSubscriptionRoutes = require('./routes/softwareSubscriptionRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const configurationController = require('./controllers/configurationController');
 
 dotenv.config();
 
@@ -57,7 +58,11 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json());
+app.use(express.json({limit: '50mb'})); // Added body-parser
+app.use(express.urlencoded({limit: '50mb', extended: true})); // Added body-parser
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Logging middleware (only log route access, not body)
 app.use((req, res, next) => {
@@ -75,6 +80,11 @@ mongoose.connect(process.env.MONGODB_URI, {
   logger.info('Loading Asset model...');
   const Asset = require('./models/Asset');
   logger.info('Asset model loaded');
+  
+  // Initialize default configurations
+  configurationController.initializeDefaultConfigurations()
+    .then(() => logger.info('Default configurations initialized'))
+    .catch(err => logger.error('Error initializing default configurations:', err));
 })
 .catch((err) => logger.error('MongoDB connection error:', err));
 

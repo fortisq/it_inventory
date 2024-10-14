@@ -116,54 +116,92 @@ async function fetchAssetData() {
 }
 
 async function fetchSubscriptionData() {
+  console.log('Fetching subscription data...');
+  
   const totalSubscriptions = await Subscription.countDocuments();
-  const totalSeats = await Subscription.aggregate([
-    { $group: { _id: null, total: { $sum: '$seats' } } }
+  console.log('Total subscriptions:', totalSubscriptions);
+
+  const totalLicenses = await Subscription.aggregate([
+    { $group: { _id: null, total: { $sum: '$numberOfLicenses' } } }
   ]);
+  console.log('Total licenses:', totalLicenses[0]?.total || 0);
+
   const totalCost = await Subscription.aggregate([
     { $group: { _id: null, total: { $sum: '$cost' } } }
   ]);
+  console.log('Total cost:', totalCost[0]?.total || 0);
+
   const expiringSoon = await Subscription.countDocuments({
-    expirationDate: { $lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }
+    endDate: { $lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }
   });
+  console.log('Expiring soon:', expiringSoon);
+
   const subscriptionsByVendor = await Subscription.aggregate([
-    { $group: { _id: '$vendor', count: { $sum: 1 } } }
+    { $group: { _id: '$provider', count: { $sum: 1 } } }
   ]);
+  const subscriptionsByVendorObj = Object.fromEntries(subscriptionsByVendor.map(item => [item._id || 'Unknown', item.count]));
+  console.log('Subscriptions by vendor:', JSON.stringify(subscriptionsByVendorObj, null, 2));
+
   const subscriptionDurationDistribution = await Subscription.aggregate([
     {
       $project: {
-        duration: {
-          $floor: {
-            $divide: [{ $subtract: ['$expirationDate', '$startDate'] }, 30 * 24 * 60 * 60 * 1000]
+        durationMonths: {
+          $let: {
+            vars: {
+              monthDiff: {
+                $divide: [
+                  { $subtract: ['$endDate', '$startDate'] },
+                  1000 * 60 * 60 * 24 * 30
+                ]
+              }
+            },
+            in: {
+              $cond: {
+                if: { $lt: ['$$monthDiff', 1] },
+                then: 'Less than 1 month',
+                else: {
+                  $concat: [
+                    { $toString: { $ceil: '$$monthDiff' } },
+                    ' months'
+                  ]
+                }
+              }
+            }
           }
         },
         cost: 1,
-        seats: 1
+        numberOfLicenses: 1
       }
     },
     {
       $group: {
-        _id: '$duration',
+        _id: '$durationMonths',
         count: { $sum: 1 },
         totalCost: { $sum: '$cost' },
-        totalLicenses: { $sum: '$seats' }
+        totalLicenses: { $sum: '$numberOfLicenses' }
       }
     },
     { $sort: { _id: 1 } }
   ]);
+  const subscriptionDurationDistributionObj = Object.fromEntries(
+    subscriptionDurationDistribution.map(item => [
+      item._id,
+      {
+        count: item.count,
+        totalCost: item.totalCost,
+        totalLicenses: item.totalLicenses
+      }
+    ])
+  );
+  console.log('Subscription duration distribution:', JSON.stringify(subscriptionDurationDistributionObj, null, 2));
 
   return {
     totalSubscriptions,
-    totalSeats: totalSeats[0]?.total || 0,
+    totalLicenses: totalLicenses[0]?.total || 0,
     totalCost: totalCost[0]?.total || 0,
     expiringSoon,
-    subscriptionsByVendor: Object.fromEntries(subscriptionsByVendor.map(item => [item._id, item.count])),
-    subscriptionDurationDistribution: subscriptionDurationDistribution.map(item => ({
-      duration: `${item._id} months`,
-      count: item.count,
-      totalCost: item.totalCost,
-      totalLicenses: item.totalLicenses
-    }))
+    subscriptionsByVendor: subscriptionsByVendorObj,
+    subscriptionDurationDistribution: subscriptionDurationDistributionObj
   };
 }
 
@@ -300,7 +338,7 @@ async function addExcelSection(worksheet, sectionName, sectionData) {
     if (typeof value === 'object' && !Array.isArray(value)) {
       worksheet.addRow([key.charAt(0).toUpperCase() + key.slice(1)]);
       for (const [subKey, subValue] of Object.entries(value)) {
-        worksheet.addRow([subKey, subValue]);
+        worksheet.addRow([subKey, JSON.stringify(subValue)]);
       }
     } else {
       worksheet.addRow([key, JSON.stringify(value)]);

@@ -1,51 +1,131 @@
 .user-management {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-.user-form {
+.user-management h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.error, .success {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.menu-toggle {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.user-management-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+}
+
+.user-management-content.open {
+  display: flex;
+}
+
+.user-form {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.user-form h3 {
+  margin-top: 0;
   margin-bottom: 20px;
+  color: #333;
+}
+
+.user-form label {
+  display: block;
+  margin-bottom: 5px;
+  color: #666;
 }
 
 .user-form input,
-.user-form select,
-.user-form button {
-  padding: 8px;
-  font-size: 16px;
-}
-
-.user-filter {
-  margin-bottom: 20px;
-}
-
-.user-filter input {
+.user-form select {
   width: 100%;
   padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   font-size: 16px;
+}
+
+.user-form button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.user-form button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .user-list {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.user-list h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.user-list ul {
   list-style-type: none;
   padding: 0;
 }
 
 .user-item {
-  background-color: #f5f5f5;
-  border-radius: 5px;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 4px;
   padding: 15px;
   margin-bottom: 15px;
 }
 
 .user-info {
-  margin-bottom: 10px;
-}
-
-.user-info h3 {
-  margin-top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .user-actions {
@@ -54,20 +134,116 @@
 }
 
 .user-actions button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
   padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
   font-size: 14px;
+  margin: 4px 2px;
   cursor: pointer;
+  border-radius: 4px;
 }
 
-.user-edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.user-actions button:last-child {
+  background-color: #f44336;
 }
 
-.user-edit-form input,
-.user-edit-form select,
-.user-edit-form button {
+.user-edit {
+  margin-top: 15px;
+}
+
+.user-edit input,
+.user-edit select {
+  width: 100%;
   padding: 8px;
-  font-size: 16px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.user-edit button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.user-edit button:last-child {
+  background-color: #f44336;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(0,0,0,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.delete-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.delete-modal h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  margin-left: 10px;
+}
+
+.access-denied {
+  text-align: center;
+  padding: 50px;
+  font-size: 24px;
+  color: #f44336;
 }

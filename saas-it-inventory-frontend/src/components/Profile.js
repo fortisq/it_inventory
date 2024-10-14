@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import Message from './Message';
+import api from '../services/api';
+import './Profile.css';
 
-function Profile() {
-  const { user, updateProfile, error, success, clearError, clearSuccess } = useAuth();
+const Profile = () => {
+  const { user, updateUser } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    jobTitle: '',
+    department: ''
   });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -16,16 +21,11 @@ function Profile() {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         email: user.email || '',
+        jobTitle: user.jobTitle || '',
+        department: user.department || ''
       });
     }
   }, [user]);
-
-  useEffect(() => {
-    return () => {
-      clearError();
-      clearSuccess();
-    };
-  }, [clearError, clearSuccess]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,17 +33,34 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateProfile(formData);
+    setError('');
+    setSuccess('');
+
+    try {
+      console.log('Submitting form data:', formData);
+      const response = await api.put('/api/auth/profile', formData);
+      console.log('Profile update response:', response.data);
+      updateUser(response.data.user);
+      setSuccess('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      console.error('Error response:', error.response);
+      setError('Failed to update profile. Please try again.');
+    }
   };
 
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div>
-      <h2>Profile</h2>
-      {error && <Message type="error">{error}</Message>}
-      {success && <Message type="success">{success}</Message>}
+    <div className="profile-container">
+      <h2>User Profile</h2>
+      {error && <div className="error-message">{error}</div>}
+      {success && <div className="success-message">{success}</div>}
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="firstName">First Name:</label>
+        <div className="form-group">
+          <label htmlFor="firstName">First Name</label>
           <input
             type="text"
             id="firstName"
@@ -53,8 +70,8 @@ function Profile() {
             required
           />
         </div>
-        <div>
-          <label htmlFor="lastName">Last Name:</label>
+        <div className="form-group">
+          <label htmlFor="lastName">Last Name</label>
           <input
             type="text"
             id="lastName"
@@ -64,8 +81,8 @@ function Profile() {
             required
           />
         </div>
-        <div>
-          <label htmlFor="email">Email:</label>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
@@ -75,10 +92,30 @@ function Profile() {
             required
           />
         </div>
-        <button type="submit">Update Profile</button>
+        <div className="form-group">
+          <label htmlFor="jobTitle">Job Title</label>
+          <input
+            type="text"
+            id="jobTitle"
+            name="jobTitle"
+            value={formData.jobTitle}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="department">Department</label>
+          <input
+            type="text"
+            id="department"
+            name="department"
+            value={formData.department}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">Update Profile</button>
       </form>
     </div>
   );
-}
+};
 
 export default Profile;
