@@ -85,7 +85,7 @@ ensure_directories() {
 install_system_dependencies() {
     log "Checking and installing system dependencies..."
     sudo apt-get update
-    sudo apt-get install -y curl wget git build-essential
+    sudo apt-get install -y curl wget git build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 }
 
 # Function to check Docker daemon status
