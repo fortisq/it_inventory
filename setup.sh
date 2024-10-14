@@ -236,11 +236,11 @@ main_setup() {
     # Install frontend dependencies
     log "Installing frontend dependencies..."
     cd saas-it-inventory-frontend || error "Failed to navigate to frontend directory"
-    retry 3 npm install || error "Failed to install frontend dependencies"
+    retry 3 npm install --legacy-peer-deps || error "Failed to install frontend dependencies"
     
     # Install additional frontend dependencies for PDFs, Excel, and charts
     log "Installing additional frontend dependencies..."
-    retry 3 npm install chart.js@^3.0.0 file-saver xlsx jspdf jspdf-autotable || error "Failed to install additional frontend dependencies"
+    retry 3 npm install --legacy-peer-deps chart.js@^4.4.4 file-saver xlsx jspdf jspdf-autotable || error "Failed to install additional frontend dependencies"
     
     cd ..
 

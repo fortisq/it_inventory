@@ -55,5 +55,8 @@
   },
   "proxy": "http://localhost:3000",
   "author": "Dan Bressers <dan@nitsolutions.ltd>",
-  "license": "MIT"
+  "license": "MIT",
+  "resolutions": {
+    "chart.js": "^4.4.4"
+  }
 }
