@@ -17,19 +17,23 @@ sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-de
 log "Cleaning npm cache"
 npm cache clean --force
 
-# Remove existing node_modules
-log "Removing existing node_modules"
-rm -rf node_modules
+# Remove existing node_modules and package-lock.json
+log "Removing existing node_modules and package-lock.json"
+rm -rf node_modules package-lock.json
+
+# Install production dependencies
+log "Installing production dependencies"
+npm ci --only=production --verbose
 
 # Install canvas from source
 log "Installing canvas from source"
 npm install canvas --build-from-source
 
-# Install other dependencies
-log "Installing other dependencies"
+# Install other specific dependencies
+log "Installing other specific dependencies"
 npm install chartjs-node-canvas readable-stream@3.6.2
 
-log "Canvas installation completed"
+log "Installation completed"
 
 # Test if we can require the modules
 log "Testing if modules can be required"
