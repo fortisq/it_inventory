@@ -5,7 +5,7 @@ FROM node:18-alpine AS builder
 WORKDIR /usr/src/app
 
 # Install build dependencies
-RUN apk add --no-cache build-base cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+RUN apk add --no-cache build-base cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev python3 make g++
 
 # Print Node.js and npm versions
 RUN echo "Node.js version: $(node -v)" && echo "npm version: $(npm -v)"
@@ -41,7 +41,7 @@ RUN apk add --no-cache cairo pango jpeg giflib librsvg
 COPY package*.json ./
 
 # Install production dependencies
-RUN npm install --only=production --verbose
+RUN npm ci --only=production --verbose
 
 # Copy built node modules and compiled code from the build stage
 COPY --from=builder /usr/src/app .
