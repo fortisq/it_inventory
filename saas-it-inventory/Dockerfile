@@ -4,14 +4,26 @@ FROM node:18-alpine AS builder
 # Set the working directory
 WORKDIR /usr/src/app
 
+# Print Node.js and npm versions
+RUN echo "Node.js version: $(node -v)" && echo "npm version: $(npm -v)"
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+# Print package.json contents
+RUN echo "Contents of package.json:" && cat package.json
+
 # Install dependencies
-RUN npm install
+RUN npm install --verbose
+
+# Print installed packages
+RUN echo "Installed packages:" && npm list --depth=0
 
 # Copy the rest of the application code
 COPY . .
+
+# Print list of files
+RUN echo "Files in the current directory:" && ls -la
 
 # Production stage
 FROM node:18-alpine
@@ -23,7 +35,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install production dependencies
-RUN npm install --only=production
+RUN npm install --only=production --verbose
 
 # Copy built node modules and compiled code from the build stage
 COPY --from=builder /usr/src/app .
@@ -46,5 +58,10 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD node healthcheck.js
 
-# Start the application
-CMD ["node", "server.js"]
+# Start the application with logging
+CMD echo "Starting server..." && \
+    echo "Environment variables:" && \
+    env && \
+    echo "Current directory contents:" && \
+    ls -la && \
+    node server.js

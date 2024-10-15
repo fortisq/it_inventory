@@ -253,14 +253,25 @@ main_setup() {
     # Install frontend dependencies
     log "Installing frontend dependencies..."
     cd saas-it-inventory-frontend || error "Failed to navigate to frontend directory"
-    retry 3 npm install --legacy-peer-deps --force || error "Failed to install frontend dependencies"
-    
+    log "Current directory: $(pwd)"
+    log "Contents of package.json:"
+    cat package.json
+    log "Installing dependencies..."
+    npm install --verbose || error "Failed to install frontend dependencies"
+    log "Installed packages:"
+    npm list --depth=0
     cd ..
 
     # Install backend dependencies
     log "Installing backend dependencies..."
     cd saas-it-inventory || error "Failed to navigate to backend directory"
-    retry 3 npm install || error "Failed to install backend dependencies"
+    log "Current directory: $(pwd)"
+    log "Contents of package.json:"
+    cat package.json
+    log "Installing dependencies..."
+    npm install --verbose || error "Failed to install backend dependencies"
+    log "Installed packages:"
+    npm list --depth=0
     cd ..
 
     # Create and configure .env file
@@ -288,7 +299,18 @@ EOF
 
     # Build and start the containers
     log "Building and starting Docker containers..."
+    log "Contents of docker-compose.yml:"
+    cat docker-compose.yml
     retry 3 docker-compose up -d --build || error "Failed to build and start Docker containers"
+
+    log "Docker containers after build:"
+    docker-compose ps
+
+    log "Logs from frontend container:"
+    docker-compose logs frontend
+
+    log "Logs from backend container:"
+    docker-compose logs backend
 
     log "Waiting for services to start..."
     sleep 30

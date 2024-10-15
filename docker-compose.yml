@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   backend:
-    build: ./saas-it-inventory
+    build:
+      context: ./saas-it-inventory
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -26,6 +28,16 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    command: >
+      sh -c "
+        echo 'Starting backend service...' &&
+        echo 'Environment variables:' &&
+        env &&
+        echo 'Running npm install...' &&
+        npm install --verbose &&
+        echo 'Starting server...' &&
+        node server.js
+      "
 
   frontend:
     build:
@@ -52,6 +64,16 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    command: >
+      sh -c "
+        echo 'Starting frontend service...' &&
+        echo 'Environment variables:' &&
+        env &&
+        echo 'Nginx configuration:' &&
+        cat /etc/nginx/nginx.conf &&
+        echo 'Starting Nginx...' &&
+        nginx -g 'daemon off;'
+      "
 
   mongo:
     image: mongo:4.4
@@ -68,6 +90,11 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    command: >
+      sh -c "
+        echo 'Starting MongoDB service...' &&
+        mongod --logpath /var/log/mongodb/mongod.log --logappend
+      "
 
 volumes:
   mongo-data:
