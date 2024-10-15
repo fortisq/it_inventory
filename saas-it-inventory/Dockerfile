@@ -5,7 +5,7 @@ FROM node:18-alpine AS builder
 WORKDIR /usr/src/app
 
 # Install build dependencies
-RUN apk add --no-cache build-base cairo-dev pango-dev
+RUN apk add --no-cache build-base cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
 
 # Print Node.js and npm versions
 RUN echo "Node.js version: $(node -v)" && echo "npm version: $(npm -v)"
@@ -35,7 +35,7 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Install runtime dependencies
-RUN apk add --no-cache cairo pango
+RUN apk add --no-cache cairo pango jpeg giflib librsvg
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
