@@ -137,6 +137,34 @@ clean_and_reinstall_node_modules() {
     npm install || error "Failed to reinstall node modules"
 }
 
+# Function to install and verify Docker Compose
+install_docker_compose() {
+    if ! command_exists docker-compose; then
+        log "Installing Docker Compose..."
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose || error "Failed to download Docker Compose"
+        sudo chmod +x /usr/local/bin/docker-compose || error "Failed to make Docker Compose executable"
+        
+        # Add docker-compose to PATH if it's not already there
+        if ! echo $PATH | grep -q "/usr/local/bin"; then
+            echo 'export PATH=$PATH:/usr/local/bin' >> ~/.bashrc
+            source ~/.bashrc
+        fi
+    fi
+    
+    # Verify Docker Compose installation
+    if ! command_exists docker-compose; then
+        error "Docker Compose installation failed. Please install it manually and try again."
+    fi
+    
+    log "Docker Compose is installed. Checking version..."
+    compose_version=$(docker-compose --version | awk '{print $3}' | cut -d',' -f1)
+    if version_ge "$compose_version" "1.29.2"; then
+        log "Docker Compose version is 1.29.2 or higher. Proceeding with installation."
+    else
+        error "Docker Compose version 1.29.2 or higher is required. Current version: $compose_version"
+    fi
+}
+
 # Main setup function
 main_setup() {
     # Check for updates
@@ -212,20 +240,8 @@ main_setup() {
         fi
     fi
 
-    # Install Docker Compose
-    if ! command_exists docker-compose; then
-        log "Installing Docker Compose..."
-        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose || error "Failed to download Docker Compose"
-        sudo chmod +x /usr/local/bin/docker-compose || error "Failed to make Docker Compose executable"
-    else
-        log "Docker Compose is already installed. Checking version..."
-        compose_version=$(docker-compose --version | awk '{print $3}' | cut -d',' -f1)
-        if version_ge "$compose_version" "1.29.2"; then
-            log "Docker Compose version is 1.29.2 or higher. Proceeding with installation."
-        else
-            error "Docker Compose version 1.29.2 or higher is required. Current version: $compose_version"
-        fi
-    fi
+    # Install and verify Docker Compose
+    install_docker_compose
 
     # Start Docker service
     log "Starting Docker service..."
@@ -293,9 +309,6 @@ EOF
     log "Building and starting Docker containers..."
     log "Contents of docker-compose.yml:"
     cat docker-compose.yml
-    if ! command -v docker-compose &>/dev/null; then
-        error "docker-compose not found. Please install docker-compose before proceeding."
-    fi
     retry 3 docker-compose up -d --build || error "Failed to build and start Docker containers"
 
     log "Docker containers after build:"
