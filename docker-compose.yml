@@ -53,12 +53,6 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "/healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     logging:
       driver: "json-file"
       options:
