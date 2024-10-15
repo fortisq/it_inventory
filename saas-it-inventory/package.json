@@ -9,10 +9,12 @@
     "seed": "node scripts/seedData.js",
     "test": "jest",
     "lint": "eslint .",
-    "health-check": "bash ../scripts/healthCheck.sh"
+    "health-check": "bash ../scripts/healthCheck.sh",
+    "postinstall": "node-pre-gyp install --fallback-to-build --update-binary && node-gyp rebuild"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "canvas": "^2.11.2",
     "chart.js": "^3.9.1",
     "chartjs-node-canvas": "^4.1.6",
     "cors": "^2.8.5",
@@ -29,6 +31,7 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
     "pdfkit": "^0.14.0",
+    "readable-stream": "^3.6.2",
     "semver": "^7.5.4",
     "stripe": "^14.10.0",
     "winston": "^3.11.0"

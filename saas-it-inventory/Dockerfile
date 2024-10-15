@@ -36,26 +36,27 @@ COPY . .
 RUN echo "Files in the current directory:" && ls -la
 
 # Production stage
-FROM node:18-slim
+FROM node:18
 
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Install system dependencies for canvas
+# Install system dependencies and build tools for canvas
 RUN apt-get update && apt-get install -y \
-    libcairo2 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libjpeg62-turbo \
-    libgif7 \
-    librsvg2-2 \
+    build-essential \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
+    python3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install production dependencies
-RUN npm ci --only=production --verbose
+# Install production dependencies and run postinstall script
+RUN npm ci --only=production --verbose && npm run postinstall
 
 # Copy built node modules and compiled code from the build stage
 COPY --from=builder /usr/src/app .
