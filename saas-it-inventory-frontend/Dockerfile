@@ -1,11 +1,8 @@
 # Build stage
-FROM node:20-alpine AS build
+FROM node:16-alpine AS build
 
 # Set working directory
 WORKDIR /app
-
-# Set environment variable for legacy OpenSSL provider
-ENV NODE_OPTIONS=--openssl-legacy-provider
 
 # Update npm to the latest version and print versions
 RUN npm install -g npm@latest && \
@@ -15,9 +12,9 @@ RUN npm install -g npm@latest && \
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
-RUN npm install @types/node
+# Install dependencies with verbose output
+RUN npm install --verbose
+RUN npm install @types/node --verbose
 
 # Copy the rest of the application code
 COPY . .
@@ -47,7 +44,7 @@ RUN echo '#!/bin/sh' > /healthcheck.sh && \
 # Expose port 80
 EXPOSE 80
 
-# Use environment variable for backend URL
+# Use environment variable for backend URL with a default value
 ENV BACKEND_URL=http://localhost:3000
 
 # Start nginx and enable error logging
