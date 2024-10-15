@@ -55,8 +55,11 @@ RUN apt-get update && apt-get install -y \
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install production dependencies and run postinstall script
-RUN npm ci --only=production --verbose && npm run postinstall
+# Install production dependencies, semver, and rebuild canvas
+RUN npm ci --only=production --verbose && \
+    npm install semver && \
+    npm rebuild canvas --update-binary && \
+    npm run postinstall
 
 # Copy built node modules and compiled code from the build stage
 COPY --from=builder /usr/src/app .
