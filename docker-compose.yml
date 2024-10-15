@@ -21,6 +21,11 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   frontend:
     build:
@@ -35,10 +40,15 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      test: ["CMD", "/healthcheck.sh"]
       interval: 30s
       timeout: 10s
       retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   mongo:
     image: mongo:4.4
@@ -50,6 +60,11 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
 volumes:
   mongo-data:

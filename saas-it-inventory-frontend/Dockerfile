@@ -30,14 +30,25 @@ RUN npm run build -- --verbose
 # Production stage
 FROM nginx:1.21-alpine
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy the build output to replace the default nginx contents
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port 8080
-EXPOSE 8080
+# Create a healthcheck script
+RUN echo '#!/bin/sh' > /healthcheck.sh && \
+    echo 'curl -f http://localhost:80 || exit 1' >> /healthcheck.sh && \
+    chmod +x /healthcheck.sh
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Expose port 80
+EXPOSE 80
+
+# Start nginx and enable error logging
+CMD ["nginx", "-g", "daemon off; error_log /dev/stdout debug;"]
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD /healthcheck.sh
