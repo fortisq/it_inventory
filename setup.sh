@@ -25,7 +25,7 @@ cleanup() {
             log "docker-compose not found. Skipping container cleanup."
         fi
         rm -f .env saas-it-inventory-frontend/.env
-        log "Cleanup complete. Please run the script again."
+        log "Cleanup complete. Please check the error messages above and try running the script again."
     fi
 }
 
@@ -158,11 +158,18 @@ main_setup() {
     if [ -f "mongodb_setup.sh" ]; then
         chmod +x mongodb_setup.sh
         if ! ./mongodb_setup.sh; then
-            error "Failed to run MongoDB setup script. Check mongodb_setup.sh for errors."
+            error "Failed to run MongoDB setup script. Please check the output above for more details."
         fi
     else
         error "MongoDB setup script not found. Please ensure mongodb_setup.sh is in the same directory as setup.sh"
     fi
+
+    # Verify MongoDB installation
+    log "Verifying MongoDB installation..."
+    if ! command_exists mongod; then
+        error "MongoDB installation failed. Please check the mongodb_setup.sh script for errors."
+    fi
+    log "MongoDB installation verified."
 
     # Check if user is in docker group
     if ! groups | grep -q docker; then
