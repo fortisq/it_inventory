@@ -10,7 +10,7 @@
     "test": "jest",
     "lint": "eslint .",
     "health-check": "bash ../scripts/healthCheck.sh",
-    "postinstall": "npm install semver && npm rebuild canvas --update-binary"
+    "postinstall": "npm install readable-stream@3.6.2 && npm rebuild canvas --update-binary"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -31,6 +31,7 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
     "pdfkit": "^0.14.0",
+    "readable-stream": "^3.6.2",
     "semver": "^7.5.4",
     "stripe": "^14.10.0",
     "winston": "^3.11.0"
