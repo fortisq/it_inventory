@@ -51,7 +51,7 @@ EXPOSE 80
 ENV BACKEND_URL=http://backend:3000
 
 # Start nginx and enable error logging
-CMD /bin/sh -c "envsubst '\$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off; error_log /dev/stdout debug;'"
+CMD /bin/sh -c "envsubst '\$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && cat /etc/nginx/nginx.conf && nginx -g 'daemon off; error_log /dev/stdout debug;'"
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD /healthcheck.sh
