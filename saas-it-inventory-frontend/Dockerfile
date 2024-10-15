@@ -41,14 +41,14 @@ COPY --from=build /app/build /usr/share/nginx/html
 
 # Create a healthcheck script
 RUN echo '#!/bin/sh' > /healthcheck.sh && \
-    echo 'curl -f http://localhost:80 || exit 1' >> /healthcheck.sh && \
+    echo 'curl -f http://localhost || exit 1' >> /healthcheck.sh && \
     chmod +x /healthcheck.sh
 
 # Expose port 80
 EXPOSE 80
 
 # Use environment variable for backend URL
-ENV BACKEND_URL=http://localhost:3000
+ENV BACKEND_URL=http://backend:3000
 
 # Start nginx and enable error logging
 CMD /bin/sh -c "envsubst '\$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off; error_log /dev/stdout debug;'"
