@@ -4,6 +4,9 @@ FROM node:18-alpine AS builder
 # Set the working directory
 WORKDIR /usr/src/app
 
+# Install build dependencies
+RUN apk add --no-cache build-base cairo-dev pango-dev
+
 # Print Node.js and npm versions
 RUN echo "Node.js version: $(node -v)" && echo "npm version: $(npm -v)"
 
@@ -30,6 +33,9 @@ FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app
+
+# Install runtime dependencies
+RUN apk add --no-cache cairo pango
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
