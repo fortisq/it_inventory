@@ -30,15 +30,13 @@ sudo apt-get update || handle_error "Failed to update package lists"
 log "Installing libssl1.1..."
 sudo apt-get install -y libssl1.1 || handle_error "Failed to install libssl1.1"
 
-# Download and import the MongoDB GPG key using gpg
+# Download and import the MongoDB GPG key using apt-key
 log "Importing MongoDB GPG key..."
-KEYRING_PATH="/usr/share/keyrings/mongodb-archive-keyring.gpg"
-mkdir -p /usr/share/keyrings
-wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo gpg --dearmor > "$KEYRING_PATH" || handle_error "Failed to import MongoDB GPG key"
+wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add - || handle_error "Failed to import MongoDB GPG key"
 
-# Add MongoDB repository with explicit keyring path
+# Add MongoDB repository
 log "Adding MongoDB repository..."
-sudo sh -c 'echo "deb [ arch=amd64,arm64 signed-by="/usr/share/keyrings/mongodb-archive-keyring.gpg" ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-5.0.list' || handle_error "Failed to add MongoDB repository"
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list || handle_error "Failed to add MongoDB repository"
 
 # Update package lists again
 log "Updating package lists..."
