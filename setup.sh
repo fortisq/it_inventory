@@ -88,8 +88,8 @@ ensure_directories() {
 # Function to check and install system dependencies
 install_system_dependencies() {
     log "Checking and installing system dependencies..."
-    sudo apt-get update
-    sudo apt-get install -y curl wget git build-essential
+    sudo apt-get update || error "Failed to update package lists"
+    sudo apt-get install -y curl wget git build-essential || error "Failed to install system dependencies"
 }
 
 # Function to check Docker daemon status
@@ -189,7 +189,7 @@ main_setup() {
 
     # Install Node.js 18.x
     log "Installing Node.js 18.x..."
-    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - || error "Failed to set up Node.js repository"
     sudo apt-get install -y nodejs || error "Failed to install Node.js 18.x"
 
     # Verify Node.js and npm versions

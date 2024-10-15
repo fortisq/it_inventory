@@ -32,10 +32,10 @@ sudo apt-get install -y libssl1.1
 
 # Import the MongoDB public GPG key
 log "Importing MongoDB GPG key..."
-wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-archive-keyring.gpg
 
 # Verify the key has been added
-if sudo apt-key list | grep -q "MongoDB 5.0"; then
+if [ -f "/usr/share/keyrings/mongodb-archive-keyring.gpg" ]; then
     log "MongoDB GPG key successfully imported."
 else
     log "Error: Failed to import MongoDB GPG key."
@@ -44,7 +44,7 @@ fi
 
 # Add MongoDB repository
 log "Adding MongoDB repository..."
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-archive-keyring.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 
 # Update package lists again
 log "Updating package lists..."
