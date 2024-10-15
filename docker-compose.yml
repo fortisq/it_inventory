@@ -11,7 +11,7 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:-defaultencryptionkey}
       - NODE_ENV=production
       - PORT=3000
-      - FRONTEND_URL=http://localhost:80
+      - FRONTEND_URL=http://localhost
     depends_on:
       mongo:
         condition: service_healthy
@@ -35,6 +35,7 @@ services:
       - "80:80"
     environment:
       - REACT_APP_API_URL=http://localhost:3000/api
+      - BACKEND_URL=http://localhost:3000
     depends_on:
       backend:
         condition: service_healthy

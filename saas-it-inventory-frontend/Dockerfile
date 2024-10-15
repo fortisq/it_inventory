@@ -34,7 +34,7 @@ FROM nginx:1.21-alpine
 RUN apk add --no-cache curl
 
 # Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf.template
 
 # Copy the build output to replace the default nginx contents
 COPY --from=build /app/build /usr/share/nginx/html
@@ -47,8 +47,11 @@ RUN echo '#!/bin/sh' > /healthcheck.sh && \
 # Expose port 80
 EXPOSE 80
 
+# Use environment variable for backend URL
+ENV BACKEND_URL=http://backend:3000
+
 # Start nginx and enable error logging
-CMD ["nginx", "-g", "daemon off; error_log /dev/stdout debug;"]
+CMD /bin/sh -c "envsubst '\$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off; error_log /dev/stdout debug;'"
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD /healthcheck.sh
