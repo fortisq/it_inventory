@@ -4,9 +4,6 @@ FROM node:18-alpine AS builder
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Install build dependencies
-RUN apk add --no-cache build-base cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev python3 make g++
-
 # Print Node.js and npm versions
 RUN echo "Node.js version: $(node -v)" && echo "npm version: $(npm -v)"
 
@@ -17,7 +14,7 @@ COPY package*.json ./
 RUN echo "Contents of package.json:" && cat package.json
 
 # Install dependencies
-RUN npm install --verbose
+RUN npm ci --verbose
 
 # Print installed packages
 RUN echo "Installed packages:" && npm list --depth=0
@@ -33,9 +30,6 @@ FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app
-
-# Install runtime dependencies
-RUN apk add --no-cache cairo pango jpeg giflib librsvg
 
 # Copy package.json and package-lock.json
 COPY package*.json ./

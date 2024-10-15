@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "chartjs-node-canvas": "^4.1.6",
+    "chart.js": "^3.9.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "exceljs": "^4.4.0",
@@ -42,10 +42,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "overrides": {
-    "canvas": "0.0.1",
-    "node-pre-gyp": "0.0.1"
   },
   "repository": {
     "type": "git",
