@@ -23,8 +23,10 @@ COPY package*.json ./
 # Print package.json contents
 RUN echo "Contents of package.json:" && cat package.json
 
-# Install dependencies
-RUN npm ci --verbose
+# Clean npm cache and install dependencies
+RUN npm cache clean --force && \
+    npm install canvas --build-from-source && \
+    npm install
 
 # Print installed packages
 RUN echo "Installed packages:" && npm list --depth=0
@@ -41,7 +43,7 @@ FROM node:18
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Install system dependencies and build tools for canvas
+# Install system dependencies for canvas
 RUN apt-get update && apt-get install -y \
     build-essential \
     libcairo2-dev \
@@ -49,15 +51,16 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libgif-dev \
     librsvg2-dev \
-    python3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install production dependencies, run postinstall script, and clean up
-RUN npm ci --only=production --verbose && \
-    npm run postinstall && \
+# Install production dependencies and clean up
+RUN npm cache clean --force && \
+    npm ci --only=production --verbose && \
+    npm install canvas --build-from-source && \
+    npm install chartjs-node-canvas readable-stream@3.6.2 && \
     npm cache clean --force
 
 # Copy built node modules and compiled code from the build stage
