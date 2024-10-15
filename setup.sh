@@ -152,6 +152,13 @@ wait_for_backend() {
     error "Backend failed to become healthy after $max_attempts attempts"
 }
 
+# Function to clean and reinstall node modules
+clean_and_reinstall_node_modules() {
+    log "Cleaning and reinstalling node modules..."
+    rm -rf node_modules package-lock.json
+    npm install || error "Failed to reinstall node modules"
+}
+
 # Main setup function
 main_setup() {
     # Check for updates
@@ -269,7 +276,7 @@ main_setup() {
     log "Contents of package.json:"
     cat package.json
     log "Installing dependencies..."
-    npm install --verbose || error "Failed to install backend dependencies"
+    clean_and_reinstall_node_modules
     log "Installed packages:"
     npm list --depth=0
     cd ..
