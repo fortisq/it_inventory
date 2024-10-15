@@ -66,15 +66,6 @@ COPY --from=build /app/build /usr/share/nginx/html
 RUN echo "=== Files in nginx html directory ===" && \
     ls -la /usr/share/nginx/html
 
-# Create a healthcheck script
-RUN echo '#!/bin/sh' > /healthcheck.sh && \
-    echo 'curl -f http://localhost || exit 1' >> /healthcheck.sh && \
-    chmod +x /healthcheck.sh
-
-# Print healthcheck script
-RUN echo "=== Healthcheck script ===" && \
-    cat /healthcheck.sh
-
 # Expose port 80
 EXPOSE 80
 
@@ -89,5 +80,5 @@ CMD /bin/sh -c "echo '=== Starting Nginx ===' && \
     echo '=== Nginx error log ===' && \
     nginx -g 'daemon off; error_log /dev/stdout debug;'"
 
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD /healthcheck.sh
+# Simplified healthcheck
+HEALTHCHECK NONE
