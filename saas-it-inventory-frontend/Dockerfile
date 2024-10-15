@@ -48,7 +48,7 @@ RUN echo '#!/bin/sh' > /healthcheck.sh && \
 EXPOSE 80
 
 # Use environment variable for backend URL
-ENV BACKEND_URL=http://backend:3000
+ENV BACKEND_URL=http://localhost:3000
 
 # Start nginx and enable error logging
 CMD /bin/sh -c "envsubst '\$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && cat /etc/nginx/nginx.conf && nginx -g 'daemon off; error_log /dev/stdout debug;'"
