@@ -9,61 +9,49 @@ log() {
 
 # Function to handle errors
 handle_error() {
-    log "Error occurred in line $1"
+    log "Error occurred: $1"
     exit 1
 }
 
 # Set up error handling
-trap 'handle_error $LINENO' ERR
+trap 'handle_error "$LINENO: $BASH_SOURCE[1]:${FUNCNAME[0]}: $1"' ERR
 
 log "Starting MongoDB setup..."
 
 # Add the libssl1.1 repository
 log "Adding libssl1.1 repository..."
-echo "deb http://security.ubuntu.com/ubuntu focal-security main" | sudo tee /etc/apt/sources.list.d/focal-security.list
+echo "deb http://security.ubuntu.com/ubuntu focal-security main" | sudo tee /etc/apt/sources.list.d/focal-security.list || handle_error "Failed to add libssl1.1 repository"
 
 # Update package lists
 log "Updating package lists..."
-sudo apt-get update
+sudo apt-get update || handle_error "Failed to update package lists"
 
 # Install libssl1.1
 log "Installing libssl1.1..."
-sudo apt-get install -y libssl1.1
+sudo apt-get install -y libssl1.1 || handle_error "Failed to install libssl1.1"
 
-# Import the MongoDB public GPG key
+# Import the MongoDB public GPG key using gpg
 log "Importing MongoDB GPG key..."
-wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-archive-keyring.gpg
+KEYRING_PATH="/usr/share/keyrings/mongodb-archive-keyring.gpg"
+mkdir -p /usr/share/keyrings
+wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo gpg --dearmor > "$KEYRING_PATH" || handle_error "Failed to import MongoDB GPG key"
 
-# Verify the key has been added
-if [ -f "/usr/share/keyrings/mongodb-archive-keyring.gpg" ]; then
-    log "MongoDB GPG key successfully imported."
-else
-    log "Error: Failed to import MongoDB GPG key."
-    exit 1
-fi
-
-# Add MongoDB repository
+# Add MongoDB repository with explicit keyring
 log "Adding MongoDB repository..."
-echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-archive-keyring.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+sudo sh -c 'echo "deb [ arch=amd64,arm64 signed-by="/usr/share/keyrings/mongodb-archive-keyring.gpg" ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-5.0.list' || handle_error "Failed to add MongoDB repository"
 
 # Update package lists again
 log "Updating package lists..."
-if ! sudo apt-get update; then
-    log "Error: Failed to update package lists. Check your internet connection and repository configuration."
-    exit 1
-fi
+sudo apt-get update || handle_error "Failed to update package lists"
 
 # Install MongoDB
 log "Installing MongoDB..."
-if ! sudo apt-get install -y mongodb-org; then
-    log "Error: Failed to install MongoDB. Please check the above output for more details."
-    exit 1
-fi
+sudo apt-get install -y mongodb-org || handle_error "Failed to install MongoDB"
 
 # Start MongoDB service
 log "Starting MongoDB service..."
-sudo systemctl start mongod
-sudo systemctl enable mongod
+sudo systemctl start mongod || handle_error "Failed to start MongoDB service"
+sudo systemctl enable mongod || handle_error "Failed to enable MongoDB service"
 
 # Check MongoDB status
 log "Checking MongoDB status..."

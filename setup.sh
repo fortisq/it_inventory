@@ -19,7 +19,7 @@ error_log() {
 cleanup() {
     if [ "$?" -ne 0 ]; then
         log "An error occurred. Cleaning up..."
-        if command_exists docker-compose; then
+        if command -v docker-compose &>/dev/null; then
             docker-compose down --remove-orphans
         else
             log "docker-compose not found. Skipping container cleanup."
@@ -37,7 +37,7 @@ error() {
 
 # Function to check if a command exists
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
+    command -v "$1" &>/dev/null
 }
 
 # Function to compare versions
@@ -293,6 +293,9 @@ EOF
     log "Building and starting Docker containers..."
     log "Contents of docker-compose.yml:"
     cat docker-compose.yml
+    if ! command -v docker-compose &>/dev/null; then
+        error "docker-compose not found. Please install docker-compose before proceeding."
+    fi
     retry 3 docker-compose up -d --build || error "Failed to build and start Docker containers"
 
     log "Docker containers after build:"
