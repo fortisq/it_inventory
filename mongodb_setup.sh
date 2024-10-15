@@ -9,8 +9,8 @@ log() {
 
 # Function to handle errors
 handle_error() {
-    log "Error occurred: $1"
-    exit 1
+  log "Error occurred: $1" >&2
+  exit 1
 }
 
 # Set up error handling
@@ -30,7 +30,7 @@ sudo apt-get update || handle_error "Failed to update package lists"
 log "Installing libssl1.1..."
 sudo apt-get install -y libssl1.1 || handle_error "Failed to install libssl1.1"
 
-# Import the MongoDB public GPG key using gpg and create keyring file
+# Download and import the MongoDB GPG key using gpg
 log "Importing MongoDB GPG key..."
 KEYRING_PATH="/usr/share/keyrings/mongodb-archive-keyring.gpg"
 mkdir -p /usr/share/keyrings
@@ -38,9 +38,7 @@ wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo gpg --dearmo
 
 # Add MongoDB repository with explicit keyring path
 log "Adding MongoDB repository..."
-cat > /etc/apt/sources.list.d/mongodb-org-5.0.list << EOF
-deb [ arch=amd64,arm64 signed-by="$KEYRING_PATH" ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse
-EOF
+sudo sh -c 'echo "deb [ arch=amd64,arm64 signed-by="/usr/share/keyrings/mongodb-archive-keyring.gpg" ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-5.0.list' || handle_error "Failed to add MongoDB repository"
 
 # Update package lists again
 log "Updating package lists..."
