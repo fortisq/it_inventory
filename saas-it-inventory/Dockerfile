@@ -1,8 +1,18 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:18 AS builder
 
 # Set the working directory
 WORKDIR /usr/src/app
+
+# Install system dependencies for canvas
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Print Node.js and npm versions
 RUN echo "Node.js version: $(node -v)" && echo "npm version: $(npm -v)"
@@ -26,10 +36,20 @@ COPY . .
 RUN echo "Files in the current directory:" && ls -la
 
 # Production stage
-FROM node:18-alpine
+FROM node:18-slim
 
 # Set the working directory
 WORKDIR /usr/src/app
+
+# Install system dependencies for canvas
+RUN apt-get update && apt-get install -y \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libjpeg62-turbo \
+    libgif7 \
+    librsvg2-2 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -41,8 +61,8 @@ RUN npm ci --only=production --verbose
 COPY --from=builder /usr/src/app .
 
 # Create a non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nodejs -u 1001
+RUN groupadd -g 1001 nodejs
+RUN useradd -u 1001 -g nodejs -s /bin/bash -m nodejs
 
 # Set ownership and permissions
 RUN chown -R nodejs:nodejs /usr/src/app
