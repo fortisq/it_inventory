@@ -89,7 +89,7 @@ ensure_directories() {
 install_system_dependencies() {
     log "Checking and installing system dependencies..."
     sudo apt-get update || error "Failed to update package lists"
-    sudo apt-get install -y curl wget git build-essential || error "Failed to install system dependencies"
+    sudo apt-get install -y curl wget git build-essential open-vm-tools || error "Failed to install system dependencies"
 }
 
 # Function to check Docker daemon status
@@ -165,6 +165,50 @@ install_docker_compose() {
     fi
 }
 
+# Function to check and configure VMware-specific settings
+check_vmware_settings() {
+    log "Checking VMware-specific settings..."
+    
+    # Check if running in a VMware VM
+    if [ -f /sys/class/dmi/id/sys_vendor ] && grep -qi "vmware" /sys/class/dmi/id/sys_vendor; then
+        log "Running in a VMware VM. Checking VMware Tools..."
+        
+        # Check if VMware Tools is installed
+        if ! command_exists vmware-toolbox-cmd; then
+            log "VMware Tools not found. Installing open-vm-tools..."
+            sudo apt-get update
+            sudo apt-get install -y open-vm-tools
+        else
+            log "VMware Tools is installed."
+        fi
+        
+        # Check if nested virtualization is enabled
+        if grep -q vmx /proc/cpuinfo; then
+            log "Nested virtualization is enabled."
+        else
+            log "WARNING: Nested virtualization is not enabled. Docker may not work properly."
+            log "Please enable nested virtualization in your VMware settings if you encounter issues."
+        fi
+        
+        # Check resource allocation
+        log "Checking resource allocation..."
+        local cpu_count=$(nproc)
+        local total_memory=$(free -m | awk '/^Mem:/{print $2}')
+        local disk_space=$(df -h / | awk 'NR==2 {print $4}')
+        
+        log "CPU Cores: $cpu_count"
+        log "Total Memory: ${total_memory}MB"
+        log "Available Disk Space: $disk_space"
+        
+        if [ $cpu_count -lt 2 ] || [ $total_memory -lt 2048 ] || [ ${disk_space%G} -lt 10 ]; then
+            log "WARNING: Your VM might not have enough resources to run the application stack smoothly."
+            log "Recommended minimum: 2 CPU cores, 2GB RAM, 10GB free disk space."
+        fi
+    else
+        log "Not running in a VMware VM. Skipping VMware-specific checks."
+    fi
+}
+
 # Main setup function
 main_setup() {
     # Check for updates
@@ -174,6 +218,9 @@ main_setup() {
     if [ "$(id -u)" = "0" ]; then
         error "This script should not be run as root. Please run as a normal user."
     fi
+
+    # Check VMware-specific settings
+    check_vmware_settings
 
     # Check available disk space
     check_disk_space
