@@ -19,7 +19,11 @@ error_log() {
 cleanup() {
     if [ "$?" -ne 0 ]; then
         log "An error occurred. Cleaning up..."
-        docker-compose down --remove-orphans
+        if command_exists docker-compose; then
+            docker-compose down --remove-orphans
+        else
+            log "docker-compose not found. Skipping container cleanup."
+        fi
         rm -f .env saas-it-inventory-frontend/.env
         log "Cleanup complete. Please run the script again."
     fi
@@ -109,32 +113,6 @@ check_disk_space() {
     fi
 }
 
-# Function to show progress
-show_progress() {
-    local pid=$1
-    local delay=0.75
-    local spinstr='|/-\'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-        local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
-
-# Function to install MongoDB
-install_mongodb() {
-    log "Installing MongoDB..."
-    wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
-    sudo apt-get update
-    sudo apt-get install -y mongodb-org
-    sudo systemctl start mongod
-    sudo systemctl enable mongod
-}
-
 # Function to wait for backend to be healthy
 wait_for_backend() {
     log "Waiting for backend to be healthy..."
@@ -178,13 +156,13 @@ main_setup() {
     # Run MongoDB setup script
     log "Running MongoDB setup script..."
     if [ -f "mongodb_setup.sh" ]; then
-        bash mongodb_setup.sh || error "Failed to run MongoDB setup script"
+        chmod +x mongodb_setup.sh
+        if ! ./mongodb_setup.sh; then
+            error "Failed to run MongoDB setup script. Check mongodb_setup.sh for errors."
+        fi
     else
         error "MongoDB setup script not found. Please ensure mongodb_setup.sh is in the same directory as setup.sh"
     fi
-
-    # Install MongoDB
-    install_mongodb
 
     # Check if user is in docker group
     if ! groups | grep -q docker; then
