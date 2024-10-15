@@ -25,8 +25,8 @@ RUN echo "Contents of package.json:" && cat package.json
 
 # Clean npm cache and install dependencies
 RUN npm cache clean --force && \
-    npm install canvas --build-from-source && \
-    npm install
+    npm ci --verbose && \
+    npm install canvas chartjs-node-canvas readable-stream@3.6.2 --save
 
 # Print installed packages
 RUN echo "Installed packages:" && npm list --depth=0
@@ -59,8 +59,7 @@ COPY package*.json ./
 # Install production dependencies and clean up
 RUN npm cache clean --force && \
     npm ci --only=production --verbose && \
-    npm install canvas --build-from-source && \
-    npm install chartjs-node-canvas readable-stream@3.6.2 && \
+    npm install canvas chartjs-node-canvas readable-stream@3.6.2 --save && \
     npm cache clean --force
 
 # Copy built node modules and compiled code from the build stage
