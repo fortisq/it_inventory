@@ -71,8 +71,16 @@ EXPOSE 80
 
 # Use environment variable for backend URL with a default value
 ENV BACKEND_URL=http://localhost:3000
+ENV REACT_APP_API_URL=http://localhost:3000/api
+
+# Create a script to update the API URL in the built JavaScript files
+RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
+    echo 'sed -i "s|REACT_APP_API_URL_PLACEHOLDER|$REACT_APP_API_URL|g" /usr/share/nginx/html/static/js/*.js' >> /docker-entrypoint.sh && \
+    echo 'exec "$@"' >> /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh
 
 # Start nginx and enable error logging
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD /bin/sh -c "echo '=== Starting Nginx ===' && \
     envsubst '\$BACKEND_URL' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && \
     echo '=== Final Nginx configuration ===' && \

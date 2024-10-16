@@ -1,35 +1,43 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
+
+dotenv.config();
 
 async function createRootUser() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/it_inventory', {
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    console.log('Connected to MongoDB');
 
-    const existingUser = await User.findOne({ username: 'root' });
-    if (existingUser) {
+    const rootUser = await User.findOne({ username: 'root' });
+    if (rootUser) {
       console.log('Root user already exists');
       return;
     }
 
-    const hashedPassword = await bcrypt.hash('root', 10);
-    const rootUser = new User({
+    const newRootUser = new User({
       username: 'root',
-      password: hashedPassword,
       email: 'root@example.com',
-      role: 'admin',
+      password: 'root',
+      firstName: 'Root',
+      lastName: 'User',
+      role: 'admin'
     });
 
-    await rootUser.save();
+    await newRootUser.save();
     console.log('Root user created successfully');
+
   } catch (error) {
-    console.error('Error creating root user:', error);
+    console.error('Error:', error);
   } finally {
     await mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
   }
 }
 
-createRootUser();
+console.log('Script started');
+createRootUser().then(() => console.log('Script finished'));

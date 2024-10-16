@@ -386,8 +386,20 @@ EOF
     log "Creating super admin..."
     retry 3 docker-compose exec -T backend node scripts/init.js || error "Failed to create super admin"
 
+    # Set root password
+    log "Setting root password..."
+    retry 3 docker-compose exec -T backend node scripts/setRootPassword.js || error "Failed to set root password"
+
+    # Initialize configurations
+    log "Initializing configurations..."
+    retry 3 docker-compose exec -T backend node scripts/initializeConfigurations.js || error "Failed to initialize configurations"
+
+    # Initialize dummy data
+    log "Initializing dummy data..."
+    retry 3 docker-compose exec -T backend node scripts/initializeDummyData.js || error "Failed to initialize dummy data"
+
     # Prompt to run database seeding script
-    read -p "Do you want to seed the database with initial data? (y/n) " -n 1 -r
+    read -p "Do you want to seed the database with additional initial data? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
